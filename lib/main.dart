@@ -9,25 +9,38 @@ import 'data/services/local_article_parser.dart';
 import 'data/services/mock_event_service.dart';
 import 'data/services/mock_items_service.dart';
 import 'data/services/search_service.dart';
+import 'data/services/stats_service.dart';
 import 'domain/usecases/get_events_usecase.dart';
 import 'domain/usecases/get_items_usecase.dart';
 import 'domain/usecases/item_management_usecase.dart';
 import 'domain/usecases/refresh_events_usecase.dart';
 import 'domain/usecases/search_usecase.dart';
 import 'presentation/controllers/auth_controller.dart';
+import 'presentation/controllers/bookmarks_controller.dart';
 import 'presentation/controllers/filters_controller.dart';
 import 'presentation/controllers/events_controller.dart';
+import 'presentation/controllers/history_controller.dart';
 import 'presentation/controllers/items_controller.dart';
 import 'presentation/controllers/overlay_controller.dart';
 import 'presentation/controllers/search_controller.dart';
 import 'presentation/controllers/settings_controller.dart';
+import 'presentation/controllers/sources_controller.dart';
+import 'presentation/controllers/topics_controller.dart';
+import 'presentation/controllers/trends_controller.dart';
 import 'presentation/pages/auth/auth_page.dart';
+import 'presentation/pages/bookmarks/bookmarks_page.dart';
 import 'presentation/pages/home/root_shell.dart';
 import 'presentation/pages/ingest/ingest_article_page.dart';
 import 'presentation/pages/notifications/notifications_page.dart';
 import 'presentation/pages/onboarding/onboarding_page.dart';
+import 'presentation/pages/history/history_page.dart';
+import 'presentation/pages/help/help_page.dart';
 import 'presentation/pages/search/search_page.dart';
+import 'presentation/pages/share/share_poster_page.dart';
 import 'presentation/pages/settings/settings_page.dart';
+import 'presentation/pages/sources/sources_page.dart';
+import 'presentation/pages/topics/topics_page.dart';
+import 'presentation/pages/trends/trends_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,6 +58,15 @@ void main() async {
   final searchController = SearchPageController(SearchUseCase(const SearchService()));
   final filtersController = FiltersController(prefs);
   final authController = AuthController();
+  final bookmarksController = BookmarksController(prefs);
+  final historyController = HistoryController(getEvents);
+  final topicsController = TopicsController(prefs, eventsController);
+  final sourcesController = SourcesController(prefs, eventsController);
+  final trendsController = TrendsController(const StatsService());
+  eventsController.addListener(() {
+    trendsController.update(eventsController.events);
+  });
+  trendsController.update(eventsController.events);
 
   final routerState = AppRouterState();
   final routerDelegate = AppRouterDelegate(routerState, {
@@ -59,12 +81,15 @@ void main() async {
           searchController: searchController,
           filtersController: filtersController,
           parser: localParser,
+          trendsController: trendsController,
+          bookmarksController: bookmarksController,
         ),
     AppPage.search: (context) => SearchPage(
           controller: searchController,
           filtersController: filtersController,
           events: eventsController.events,
           items: itemsController.items,
+          bookmarksController: bookmarksController,
         ),
     AppPage.catalog: (context) => RootShell(
           routerState: routerState,
@@ -76,6 +101,8 @@ void main() async {
           filtersController: filtersController,
           parser: localParser,
           startIndex: 2,
+          trendsController: trendsController,
+          bookmarksController: bookmarksController,
         ),
     AppPage.myItems: (context) => RootShell(
           routerState: routerState,
@@ -87,10 +114,29 @@ void main() async {
           filtersController: filtersController,
           parser: localParser,
           startIndex: 3,
+          trendsController: trendsController,
+          bookmarksController: bookmarksController,
         ),
     AppPage.ingest: (context) => IngestArticlePage(parser: localParser, eventsController: eventsController),
     AppPage.notifications: (context) => NotificationsPage(itemsController: itemsController),
     AppPage.settings: (context) => SettingsPage(controller: settingsController),
+    AppPage.history: (context) => HistoryPage(
+          controller: historyController,
+          eventsController: eventsController,
+          bookmarksController: bookmarksController,
+        ),
+    AppPage.topics: (context) => TopicsPage(controller: topicsController),
+    AppPage.sources: (context) => SourcesPage(controller: sourcesController, eventsController: eventsController),
+    AppPage.bookmarks: (context) => BookmarksPage(
+          bookmarksController: bookmarksController,
+          eventsController: eventsController,
+        ),
+    AppPage.trends: (context) => TrendsPage(controller: trendsController),
+    AppPage.sharePoster: (context) => SharePosterPage(
+          eventsController: eventsController,
+          itemsController: itemsController,
+        ),
+    AppPage.help: (context) => const HelpAboutPage(),
   });
   final routeParser = AppRouteInformationParser();
 

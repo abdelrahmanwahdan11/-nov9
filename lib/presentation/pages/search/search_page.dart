@@ -7,6 +7,7 @@ import '../../../core/i18n/app_localizations.dart';
 import '../../../data/models/event.dart';
 import '../../../data/models/item.dart';
 import '../../../data/models/saved_filter.dart';
+import '../../controllers/bookmarks_controller.dart';
 import '../../controllers/filters_controller.dart';
 import '../../controllers/search_controller.dart';
 import '../../widgets/event_tile.dart';
@@ -19,12 +20,14 @@ class SearchPage extends StatefulWidget {
     required this.filtersController,
     required this.events,
     required this.items,
+    required this.bookmarksController,
   });
 
   final SearchPageController controller;
   final FiltersController filtersController;
   final List<Event> events;
   final List<Item> items;
+  final BookmarksController bookmarksController;
 
   @override
   State<SearchPage> createState() => _SearchPageState();
@@ -61,11 +64,16 @@ class _SearchPageState extends State<SearchPage> {
       DesignTokens.colors['lime']!,
     ];
     return AnimatedBuilder(
-      animation: Listenable.merge([widget.controller, widget.filtersController]),
+      animation: Listenable.merge([
+        widget.controller,
+        widget.filtersController,
+        widget.bookmarksController,
+      ]),
       builder: (context, _) {
         final l10n = AppLocalizations.of(context);
         final chips = _activeFilterChips(context, l10n);
-        final hasResultsContext = widget.controller.query.isNotEmpty || widget.controller.hasActiveFilters;
+        final controller = widget.controller;
+        final hasResultsContext = controller.hasResults || controller.query.isNotEmpty || controller.hasActiveFilters;
         return Scaffold(
           appBar: AppBar(
             titleSpacing: 0,
@@ -115,6 +123,7 @@ class _SearchPageState extends State<SearchPage> {
                     palette: palette,
                     onEventTap: _showEventPreview,
                     onItemTap: _showItemPreview,
+                    bookmarksController: widget.bookmarksController,
                   )
                 : _SuggestionsView(
                     controller: widget.controller,
@@ -358,12 +367,14 @@ class _ResultsView extends StatelessWidget {
     required this.palette,
     required this.onEventTap,
     required this.onItemTap,
+    required this.bookmarksController,
   });
 
   final SearchPageController controller;
   final List<Color> palette;
   final ValueChanged<Event> onEventTap;
   final ValueChanged<Item> onItemTap;
+  final BookmarksController bookmarksController;
 
   @override
   Widget build(BuildContext context) {
@@ -389,6 +400,8 @@ class _ResultsView extends StatelessWidget {
                 event: result.item,
                 palette: palette,
                 onTap: () => onEventTap(result.item),
+                onBookmark: () => bookmarksController.toggle(result.item.id),
+                isBookmarked: bookmarksController.isBookmarked(result.item.id),
               ),
             ),
           ),
@@ -464,6 +477,7 @@ class _FiltersSheetState extends State<_FiltersSheet> {
         controller.effectiveMaxPrice,
       );
     }
+    _nameController.addListener(() => setState(() {}));
   }
 
   @override

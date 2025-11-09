@@ -211,7 +211,18 @@ class SearchPageController extends ChangeNotifier {
 
   String get query => _query;
 
+  bool get hasResults => eventResults.isNotEmpty || itemResults.isNotEmpty;
+
   void _performSearch() {
+    if (_query.trim().isEmpty && !hasActiveFilters) {
+      if (eventResults.isEmpty && itemResults.isEmpty) {
+        return;
+      }
+      eventResults = const [];
+      itemResults = const [];
+      notifyListeners();
+      return;
+    }
     final results = _useCase(
       _events,
       _items,

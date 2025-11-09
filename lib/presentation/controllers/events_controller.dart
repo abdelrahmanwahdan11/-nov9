@@ -32,6 +32,16 @@ class EventsController extends ChangeNotifier {
   Set<String> get sources => _sources;
   DateTimeRange? get dateRange => _dateRange;
   String? get activeTag => _activeTag;
+  Set<String> get availableSources => _events.map((event) => event.source).toSet();
+
+  Event? findById(String id) {
+    for (final event in _events) {
+      if (event.id == id) {
+        return event;
+      }
+    }
+    return null;
+  }
 
   void _onData(List<Event> data) {
     _events
@@ -67,6 +77,14 @@ class EventsController extends ChangeNotifier {
 
   void setTagFilter(String? tag) {
     _activeTag = tag;
+    notifyListeners();
+  }
+
+  void clearTagFilter() {
+    if (_activeTag == null) {
+      return;
+    }
+    _activeTag = null;
     notifyListeners();
   }
 

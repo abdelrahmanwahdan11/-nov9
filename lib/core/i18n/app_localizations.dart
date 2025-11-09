@@ -29,6 +29,26 @@ class AppLocalizations {
       'en': 'Politics stays upfront',
       'ar': 'السياسة في المقدمة دائمًا',
     },
+    'insights_today': {
+      'en': 'Digest pulse',
+      'ar': 'نبض الملخص',
+    },
+    'insights_total': {
+      'en': 'Stories today: {count}',
+      'ar': 'القصص اليوم: {count}',
+    },
+    'insights_empty': {
+      'en': 'Insights will appear once events roll in.',
+      'ar': 'ستظهر الإحصاءات عند وصول الأحداث.',
+    },
+    'insights_tags': {
+      'en': 'Trending tags',
+      'ar': 'الوسوم الرائجة',
+    },
+    'insights_primary': {
+      'en': '{category} leads today\'s coverage.',
+      'ar': '{category} تتصدر تغطية اليوم.',
+    },
     'digest_sections': {'en': 'Sections', 'ar': 'الأقسام'},
     'stories': {'en': 'Stories', 'ar': 'قصص'},
     'skip': {'en': 'Skip', 'ar': 'تخطي'},
@@ -280,6 +300,246 @@ class AppLocalizations {
     'items.tip_low': {
       'en': "Plan a professional repair to protect {name}'s value.",
       'ar': 'خطط لصيانة احترافية للحفاظ على قيمة {name}.',
+    },
+    'bookmark_added': {
+      'en': 'Saved to bookmarks',
+      'ar': 'تمت الإضافة إلى المحفوظات',
+    },
+    'bookmark_removed': {
+      'en': 'Removed from bookmarks',
+      'ar': 'تمت الإزالة من المحفوظات',
+    },
+    'quick_facts': {
+      'en': 'Quick facts',
+      'ar': 'حقائق سريعة',
+    },
+    'related_events': {
+      'en': 'Related events',
+      'ar': 'أحداث مرتبطة',
+    },
+    'history': {
+      'en': 'History',
+      'ar': 'الأرشيف',
+    },
+    'history_filters_heading': {
+      'en': 'Refine this day',
+      'ar': 'تصفية هذا اليوم',
+    },
+    'history_bookmarked_only': {
+      'en': 'Bookmarked only',
+      'ar': 'المحفوظات فقط',
+    },
+    'history_empty': {
+      'en': 'No stories archived for this day yet.',
+      'ar': 'لا توجد قصص مؤرشفة لهذا اليوم بعد.',
+    },
+    'history_filtered_empty': {
+      'en': 'No archived stories match these filters.',
+      'ar': 'لا توجد قصص مؤرشفة تطابق هذه المرشحات.',
+    },
+    'history_results_count': {
+      'en': 'Stories: {count}',
+      'ar': 'عدد القصص: {count}',
+    },
+    'history_insights_title': {
+      'en': 'Archive snapshot',
+      'ar': 'ملخص الأرشيف',
+    },
+    'history_insights_total': {
+      'en': 'Total archived stories: {count}',
+      'ar': 'إجمالي القصص المؤرشفة: {count}',
+    },
+    'history_insights_category': {
+      'en': '{label}: {count}',
+      'ar': '{label}: {count}',
+    },
+    'bookmarks': {
+      'en': 'Bookmarks',
+      'ar': 'المحفوظات',
+    },
+    'bookmarks_search_hint': {
+      'en': 'Search saved stories',
+      'ar': 'ابحث في القصص المحفوظة',
+    },
+    'bookmarks_results_count': {
+      'en': 'Saved stories: {count}',
+      'ar': 'القصص المحفوظة: {count}',
+    },
+    'bookmarks_empty': {
+      'en': 'Add events to your bookmarks to keep them close at hand.',
+      'ar': 'أضف الأحداث إلى المحفوظات للاطلاع عليها سريعًا.',
+    },
+    'bookmarks_filtered_empty': {
+      'en': 'No bookmarks match your search yet.',
+      'ar': 'لا توجد محفوظات تطابق بحثك بعد.',
+    },
+    'bookmarks_sort_label': {
+      'en': 'Sort bookmarks',
+      'ar': 'ترتيب المحفوظات',
+    },
+    'bookmarks_sort_newest': {
+      'en': 'Newest first',
+      'ar': 'الأحدث أولًا',
+    },
+    'bookmarks_sort_oldest': {
+      'en': 'Oldest first',
+      'ar': 'الأقدم أولًا',
+    },
+    'bookmarks_sort_alphabetical': {
+      'en': 'A–Z',
+      'ar': 'أ–ي',
+    },
+    'topics': {
+      'en': 'Topics',
+      'ar': 'المواضيع',
+    },
+    'topics_description': {
+      'en': 'Choose which sections stay in your daily digest feed.',
+      'ar': 'اختر الأقسام التي تريد ظهورها في ملخصك اليومي.',
+    },
+    'topics_enable_all': {
+      'en': 'Enable all topics',
+      'ar': 'تفعيل كل المواضيع',
+    },
+    'topics_keep_politics': {
+      'en': 'Politics always stays pinned first for priority context.',
+      'ar': 'ستبقى السياسة مثبتة في المقدمة لإبراز أهميتها.',
+    },
+    'topics_politics': {
+      'en': 'Key updates on policy, diplomacy, and governance.',
+      'ar': 'آخر المستجدات في السياسة والدبلوماسية والحكم.',
+    },
+    'topics_arts': {
+      'en': 'Creative highlights from arts, culture, and festivals.',
+      'ar': 'إضاءات إبداعية من الفنون والثقافة والمهرجانات.',
+    },
+    'topics_world': {
+      'en': 'Global movements affecting the planet and economies.',
+      'ar': 'حركات عالمية تؤثر على العالم والاقتصاد.',
+    },
+    'sources': {
+      'en': 'Sources',
+      'ar': 'المصادر',
+    },
+    'sources_description': {
+      'en': 'Toggle which sources feed into your digest.',
+      'ar': 'حدد المصادر التي تغذي ملخصك.',
+    },
+    'sources_empty': {
+      'en': 'No sources available yet. Parse an article to begin.',
+      'ar': 'لا توجد مصادر حالياً. قم بتحليل مقالة للبدء.',
+    },
+    'sources_enable_all': {
+      'en': 'Enable all sources',
+      'ar': 'تفعيل كل المصادر',
+    },
+    'trends': {
+      'en': 'Trends',
+      'ar': 'التحليلات',
+    },
+    'trends_categories': {
+      'en': 'Stories by category',
+      'ar': 'القصص حسب الفئة',
+    },
+    'trends_tags': {
+      'en': 'Top tags today',
+      'ar': 'أبرز الوسوم اليوم',
+    },
+    'trends_daily': {
+      'en': 'Daily story volume',
+      'ar': 'عدد القصص اليومي',
+    },
+    'trends_empty': {
+      'en': 'Trends will appear once events roll in.',
+      'ar': 'ستظهر التحليلات عند توفر الأحداث.',
+    },
+    'settings_data_tools': {
+      'en': 'Data & backups',
+      'ar': 'البيانات والنسخ الاحتياطية',
+    },
+    'settings_backup': {
+      'en': 'Export backup JSON',
+      'ar': 'تصدير نسخة احتياطية JSON',
+    },
+    'settings_backup_ready': {
+      'en': 'Backup copied. Store it somewhere safe.',
+      'ar': 'تم تجهيز النسخة الاحتياطية. احتفظ بها في مكان آمن.',
+    },
+    'settings_restore': {
+      'en': 'Restore from backup',
+      'ar': 'استعادة من النسخة الاحتياطية',
+    },
+    'settings_restore_hint': {
+      'en': 'Paste a previously exported JSON blob here.',
+      'ar': 'الصق ملف JSON الذي تم تصديره مسبقًا هنا.',
+    },
+    'settings_restore_success': {
+      'en': 'Preferences restored',
+      'ar': 'تمت استعادة الإعدادات',
+    },
+    'settings_reset': {
+      'en': 'Reset to defaults',
+      'ar': 'إعادة الإعدادات الافتراضية',
+    },
+    'settings_reset_success': {
+      'en': 'Preferences reset',
+      'ar': 'تمت إعادة التعيين',
+    },
+    'share_poster': {
+      'en': 'Share poster',
+      'ar': 'مشاركة ملصق',
+    },
+    'share_poster_event': {
+      'en': 'Select an event',
+      'ar': 'اختر حدثًا',
+    },
+    'share_poster_item': {
+      'en': 'Select an item',
+      'ar': 'اختر مقتنى',
+    },
+    'share_poster_event_tab': {
+      'en': 'Events',
+      'ar': 'أحداث',
+    },
+    'share_poster_item_tab': {
+      'en': 'Items',
+      'ar': 'مقتنيات',
+    },
+    'share_poster_export': {
+      'en': 'Export poster',
+      'ar': 'تصدير الملصق',
+    },
+    'share_poster_none': {
+      'en': 'Add events or items to craft a poster.',
+      'ar': 'أضف أحداثًا أو مقتنيات لإنشاء ملصق.',
+    },
+    'share_poster_success': {
+      'en': 'Poster generated (~{size} KB)',
+      'ar': 'تم إنشاء الملصق (~{size} كيلوبايت)',
+    },
+    'help_about': {
+      'en': 'Help & About',
+      'ar': 'المساعدة والتعريف',
+    },
+    'help_about_faq_title': {
+      'en': 'FAQ',
+      'ar': 'الأسئلة الشائعة',
+    },
+    'help_about_faq_content': {
+      'en': 'Learn how the offline digest works, how to pin topics, and how to parse new articles without connectivity.',
+      'ar': 'تعرف على كيفية عمل الملخص دون اتصال وكيفية تثبيت المواضيع وتحليل المقالات الجديدة دون اتصال.',
+    },
+    'help_about_privacy_title': {
+      'en': 'Privacy',
+      'ar': 'الخصوصية',
+    },
+    'help_about_privacy_content': {
+      'en': 'Everything runs locally on your device. No accounts, no uploads, just personal control.',
+      'ar': 'كل شيء يعمل محليًا على جهازك. لا حسابات ولا رفع بيانات، فقط تحكم شخصي.',
+    },
+    'help_about_version': {
+      'en': 'Version 1.0.0',
+      'ar': 'الإصدار 1.0.0',
     },
   };
 

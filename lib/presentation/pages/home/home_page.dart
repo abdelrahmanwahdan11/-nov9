@@ -7,8 +7,11 @@ import '../../../core/i18n/app_localizations.dart';
 import '../../../core/router/app_router.dart';
 import '../../../data/models/event.dart';
 import '../../../data/services/local_article_parser.dart';
+import '../../../data/services/stats_service.dart';
+import '../../controllers/bookmarks_controller.dart';
 import '../../controllers/events_controller.dart';
 import '../../controllers/overlay_controller.dart';
+import '../../controllers/trends_controller.dart';
 import '../../widgets/event_tile.dart';
 import '../../widgets/overlay_sheet.dart';
 import '../../widgets/segmented_filter.dart';
@@ -23,12 +26,24 @@ class HomePage extends StatefulWidget {
     required this.overlayController,
     required this.routerState,
     required this.parser,
+    required this.bookmarksController,
+    required this.onOpenHistory,
+    required this.onOpenBookmarks,
+    required this.onOpenTopics,
+    required this.onOpenSources,
+    required this.trendsController,
   });
 
   final EventsController eventsController;
   final OverlayController overlayController;
   final AppRouterState routerState;
   final LocalArticleParser parser;
+  final BookmarksController bookmarksController;
+  final VoidCallback onOpenHistory;
+  final VoidCallback onOpenBookmarks;
+  final VoidCallback onOpenTopics;
+  final VoidCallback onOpenSources;
+  final TrendsController trendsController;
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -66,12 +81,19 @@ class _HomePageState extends State<HomePage> {
       DesignTokens.colors['lime']!,
     ];
     return AnimatedBuilder(
-      animation: Listenable.merge([widget.eventsController, widget.overlayController]),
+      animation: Listenable.merge([
+        widget.eventsController,
+        widget.overlayController,
+        widget.bookmarksController,
+        widget.trendsController,
+      ]),
       builder: (context, _) {
         final events = widget.eventsController.events;
         final politicsCount = events.where((event) => event.category == EventCategory.politics).length;
         final topStories = events.take(5).toList();
         final highlightedIds = topStories.map((event) => event.id).toSet();
+        final bookmarksCount = widget.bookmarksController.bookmarks.length;
+        final snapshot = widget.trendsController.snapshot;
         return Scaffold(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           body: Stack(
@@ -96,8 +118,27 @@ class _HomePageState extends State<HomePage> {
                         searchLabel: l10n.translate('search'),
                         storiesLabel: l10n.translate('stories'),
                         politicsLabel: l10n.translate('politics'),
+                        onOpenHistory: widget.onOpenHistory,
+                        onOpenBookmarks: widget.onOpenBookmarks,
+                        bookmarksCount: bookmarksCount,
                       ),
                     ),
+                    const SizedBox(height: 16),
+                    _QuickActions(
+                      onOpenTopics: widget.onOpenTopics,
+                      onOpenSources: widget.onOpenSources,
+                      activeTag: widget.eventsController.activeTag,
+                      onClearTag: widget.eventsController.clearTagFilter,
+                      l10n: l10n,
+                    ),
+                    if (snapshot != null && snapshot.categoryStats.any((stat) => stat.count > 0)) ...[
+                      const SizedBox(height: 20),
+                      _InsightsPanel(
+                        snapshot: snapshot,
+                        l10n: l10n,
+                        onTagTap: widget.eventsController.setTagFilter,
+                      ),
+                    ],
                     if (topStories.isNotEmpty) ...[
                       const SizedBox(height: 24),
                       _SectionTitle(
@@ -145,7 +186,12 @@ class _HomePageState extends State<HomePage> {
                 Positioned.fill(
                   child: Material(
                     color: Colors.black54,
-                    child: OverlaySheet(controller: widget.overlayController),
+                    child: OverlaySheet(
+                      controller: widget.overlayController,
+                      eventsController: widget.eventsController,
+                      bookmarksController: widget.bookmarksController,
+                      onTagSelected: (tag) => widget.eventsController.setTagFilter(tag),
+                    ),
                   ),
                 ),
             ],
@@ -226,6 +272,8 @@ class _HomePageState extends State<HomePage> {
                     palette: palette,
                     variant: variant,
                     onTap: () => widget.overlayController.show(items[index]),
+                    onBookmark: () => widget.bookmarksController.toggle(items[index].id),
+                    isBookmarked: widget.bookmarksController.isBookmarked(items[index].id),
                   ),
                 );
               }),
@@ -258,6 +306,207 @@ class _HomeBackground extends StatelessWidget {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
         ),
+      ),
+    );
+  }
+}
+
+class _QuickActions extends StatelessWidget {
+  const _QuickActions({
+    required this.onOpenTopics,
+    required this.onOpenSources,
+    required this.activeTag,
+    required this.onClearTag,
+    required this.l10n,
+  });
+
+  final VoidCallback onOpenTopics;
+  final VoidCallback onOpenSources;
+  final String? activeTag;
+  final VoidCallback onClearTag;
+  final AppLocalizations l10n;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Wrap(
+      spacing: 12,
+      runSpacing: 8,
+      children: [
+        ActionChip(
+          avatar: const Icon(IconlyLight.category, size: 18),
+          label: Text(l10n.translate('topics')),
+          onPressed: onOpenTopics,
+        ),
+        ActionChip(
+          avatar: const Icon(IconlyLight.paper, size: 18),
+          label: Text(l10n.translate('sources')),
+          onPressed: onOpenSources,
+        ),
+        if (activeTag != null && activeTag!.isNotEmpty)
+          InputChip(
+            avatar: const Icon(Icons.tag, size: 18),
+            label: Text('#$activeTag'),
+            onDeleted: onClearTag,
+            deleteIcon: const Icon(Icons.close, size: 18),
+            backgroundColor: theme.colorScheme.primary.withOpacity(0.12),
+          ),
+      ],
+    );
+  }
+}
+
+class _InsightsPanel extends StatelessWidget {
+  const _InsightsPanel({
+    required this.snapshot,
+    required this.l10n,
+    required this.onTagTap,
+  });
+
+  final StatsSnapshot snapshot;
+  final AppLocalizations l10n;
+  final ValueChanged<String> onTagTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final categories = snapshot.categoryStats
+        .where((stat) => stat.count > 0)
+        .toList()
+      ..sort((a, b) => b.count.compareTo(a.count));
+    final total = categories.fold<int>(0, (sum, stat) => sum + stat.count);
+    final tags = snapshot.topTags.where((tag) => tag.count > 0).take(6).toList();
+    final gradientBase = theme.colorScheme.primary;
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            gradientBase.withOpacity(0.22),
+            gradientBase.withOpacity(0.08),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(32),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.translate('insights_today'),
+            style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            l10n.translateWithArgs('insights_total', {'count': total.toString()}),
+            style: theme.textTheme.bodyMedium,
+          ),
+          if (categories.isEmpty) ...[
+            const SizedBox(height: 12),
+            Text(
+              l10n.translate('insights_empty'),
+              style: theme.textTheme.bodyMedium,
+            ),
+          ] else ...[
+            const SizedBox(height: 16),
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: categories
+                  .map(
+                    (stat) => _InsightMetric(
+                      label: l10n.translate(stat.category.name),
+                      count: stat.count,
+                      share: total == 0 ? 0 : stat.count / total,
+                    ),
+                  )
+                  .toList(),
+            ),
+          ],
+          if (tags.isNotEmpty) ...[
+            const SizedBox(height: 18),
+            Text(
+              l10n.translate('insights_tags'),
+              style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: tags
+                  .map(
+                    (tag) => ActionChip(
+                      label: Text('#${tag.tag}'),
+                      avatar: CircleAvatar(
+                        backgroundColor: theme.colorScheme.onPrimary.withOpacity(0.12),
+                        child: Text('${tag.count}'),
+                      ),
+                      onPressed: () => onTagTap(tag.tag),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ],
+          if (categories.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            Text(
+              l10n.translateWithArgs('insights_primary', {
+                'category': l10n.translate(categories.first.category.name),
+              }),
+              style: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _InsightMetric extends StatelessWidget {
+  const _InsightMetric({required this.label, required this.count, required this.share});
+
+  final String label;
+  final int count;
+  final double share;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final percent = (share * 100).clamp(0, 100).round();
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface.withOpacity(0.92),
+        borderRadius: BorderRadius.circular(26),
+        boxShadow: [
+          BoxShadow(
+            color: theme.colorScheme.primary.withOpacity(0.12),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '$count',
+            style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+          ),
+          const SizedBox(height: 4),
+          Text(label, style: theme.textTheme.labelLarge),
+          const SizedBox(height: 8),
+          LinearProgressIndicator(
+            value: share.clamp(0, 1),
+            minHeight: 5,
+            backgroundColor: theme.colorScheme.primary.withOpacity(0.18),
+            color: theme.colorScheme.primary,
+          ),
+          const SizedBox(height: 6),
+          Text('$percent%', style: theme.textTheme.labelSmall),
+        ],
       ),
     );
   }
@@ -297,6 +546,9 @@ class _HomeHeader extends StatelessWidget {
     required this.searchLabel,
     required this.storiesLabel,
     required this.politicsLabel,
+    required this.onOpenHistory,
+    required this.onOpenBookmarks,
+    required this.bookmarksCount,
   });
 
   final String title;
@@ -307,6 +559,9 @@ class _HomeHeader extends StatelessWidget {
   final String searchLabel;
   final String storiesLabel;
   final String politicsLabel;
+  final VoidCallback onOpenHistory;
+  final VoidCallback onOpenBookmarks;
+  final int bookmarksCount;
 
   @override
   Widget build(BuildContext context) {
@@ -314,6 +569,9 @@ class _HomeHeader extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
     final foreground = isDark ? Colors.white : Colors.black87;
     final searchBackground = isDark ? Colors.white.withOpacity(0.15) : Colors.white.withOpacity(0.85);
+    final l10n = AppLocalizations.of(context);
+    final historyLabel = l10n.translate('history');
+    final bookmarksLabel = l10n.translate('bookmarks');
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -382,6 +640,40 @@ class _HomeHeader extends StatelessWidget {
                     ),
                   ),
                 ),
+              ),
+              const SizedBox(width: 12),
+              IconButton(
+                style: IconButton.styleFrom(
+                  backgroundColor: searchBackground,
+                ),
+                onPressed: onOpenHistory,
+                icon: Icon(IconlyLight.calendar, color: foreground),
+                tooltip: historyLabel,
+              ),
+              const SizedBox(width: 12),
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  IconButton(
+                    style: IconButton.styleFrom(backgroundColor: searchBackground),
+                    onPressed: onOpenBookmarks,
+                    icon: Icon(IconlyLight.bookmark, color: foreground),
+                    tooltip: bookmarksLabel,
+                  ),
+                  if (bookmarksCount > 0)
+                    Positioned(
+                      right: -2,
+                      top: -2,
+                      child: CircleAvatar(
+                        radius: 10,
+                        backgroundColor: theme.colorScheme.error,
+                        child: Text(
+                          '$bookmarksCount',
+                          style: theme.textTheme.labelSmall?.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ],
           ),

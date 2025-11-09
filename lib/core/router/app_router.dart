@@ -11,6 +11,13 @@ enum AppPage {
   ingest,
   notifications,
   settings,
+  history,
+  topics,
+  sources,
+  bookmarks,
+  trends,
+  sharePoster,
+  help,
 }
 
 class AppRouterState extends ChangeNotifier {

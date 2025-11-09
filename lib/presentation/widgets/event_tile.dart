@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:iconly/iconly.dart';
 
-import '../../data/models/event.dart';
 import '../../core/i18n/app_localizations.dart';
+import '../../data/models/event.dart';
 import 'bento_bubble_card.dart';
 import 'parallax_3d_image.dart';
 
@@ -15,12 +15,16 @@ class EventTile extends StatelessWidget {
     required this.onTap,
     required this.palette,
     this.variant = EventTileVariant.standard,
+    this.onBookmark,
+    this.isBookmarked = false,
   });
 
   final Event event;
   final VoidCallback onTap;
   final List<Color> palette;
   final EventTileVariant variant;
+  final VoidCallback? onBookmark;
+  final bool isBookmarked;
 
   @override
   Widget build(BuildContext context) {
@@ -59,6 +63,14 @@ class EventTile extends StatelessWidget {
               ),
               const SizedBox(width: 12),
               _DateBadge(timeOfDay: timeOfDay, dateLabel: dateLabel),
+              if (onBookmark != null)
+                IconButton(
+                  icon: Icon(
+                    isBookmarked ? IconlyBold.bookmark : IconlyLight.bookmark,
+                    size: 22,
+                  ),
+                  onPressed: onBookmark,
+                ),
             ],
           ),
           const SizedBox(height: 16),

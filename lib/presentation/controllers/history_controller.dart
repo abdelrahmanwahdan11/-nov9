@@ -12,15 +12,20 @@ class HistoryController extends ChangeNotifier {
   DateTime _selectedDate = DateTime.now();
   List<Event> _events = const [];
   bool _loading = false;
+  int _requestId = 0;
 
   DateTime get selectedDate => _selectedDate;
   List<Event> get events => _events;
   bool get isLoading => _loading;
 
   Future<void> loadFor(DateTime date) async {
+    final requestId = ++_requestId;
     _loading = true;
     notifyListeners();
     final fetched = await _getEvents.getByDate(date);
+    if (requestId != _requestId) {
+      return;
+    }
     _events = fetched;
     _selectedDate = date;
     _loading = false;
