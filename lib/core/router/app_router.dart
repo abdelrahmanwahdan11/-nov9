@@ -7,6 +7,7 @@ enum AppPage {
   home,
   briefing,
   forecast,
+  scenario,
   search,
   onThisDay,
   spotlight,

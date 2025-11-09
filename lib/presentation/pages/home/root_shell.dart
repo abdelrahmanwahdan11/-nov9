@@ -14,9 +14,11 @@ import '../../controllers/search_controller.dart';
 import '../../controllers/settings_controller.dart';
 import '../../controllers/trends_controller.dart';
 import '../../controllers/forecast_controller.dart';
+import '../../controllers/scenario_controller.dart';
 import '../briefing/briefing_page.dart';
 import '../forecast/forecast_lab_page.dart';
 import '../inventory/inventory_page.dart';
+import '../scenario/scenario_planner_page.dart';
 import '../search/search_page.dart';
 import '../settings/settings_page.dart';
 import '../on_this_day/on_this_day_page.dart';
@@ -38,6 +40,7 @@ class RootShell extends StatefulWidget {
     required this.trendsController,
     required this.onThisDayController,
     required this.forecastController,
+    required this.scenarioController,
     this.startIndex = 0,
   });
 
@@ -53,6 +56,7 @@ class RootShell extends StatefulWidget {
   final TrendsController trendsController;
   final OnThisDayController onThisDayController;
   final ForecastController forecastController;
+  final ScenarioController scenarioController;
   final int startIndex;
 
   @override
@@ -79,6 +83,7 @@ class _RootShellState extends State<RootShell> {
         widget.onThisDayController,
         widget.filtersController,
         widget.forecastController,
+        widget.scenarioController,
       ]),
       builder: (context, _) {
         final l10n = AppLocalizations.of(context);
@@ -106,8 +111,10 @@ class _RootShellState extends State<RootShell> {
             searchController: widget.searchController,
             onSelectTab: (value) => setState(() => _index = value),
             onOpenForecast: () => setState(() => _index = 2),
+            onOpenScenario: () => setState(() => _index = 3),
           ),
           ForecastLabPage(controller: widget.forecastController),
+          ScenarioPlannerPage(controller: widget.scenarioController),
           SearchPage(
             controller: widget.searchController,
             filtersController: widget.filtersController,
@@ -135,18 +142,19 @@ class _RootShellState extends State<RootShell> {
           body: IndexedStack(index: _index, children: pages),
           bottomNavigationBar: NavigationBar(
             selectedIndex: _index,
-          onDestinationSelected: (value) {
-            setState(() => _index = value);
-          },
-          destinations: [
-            NavigationDestination(icon: const Icon(IconlyLight.home), label: l10n.translate('home')),
-            NavigationDestination(icon: const Icon(IconlyLight.activity), label: l10n.translate('briefing_nav')),
-            NavigationDestination(icon: const Icon(IconlyLight.chart), label: l10n.translate('forecast_nav')),
-            NavigationDestination(icon: const Icon(IconlyLight.search), label: l10n.translate('search')),
-            NavigationDestination(icon: const Icon(IconlyLight.calendar), label: l10n.translate('on_this_day_nav')),
-            NavigationDestination(icon: const Icon(IconlyLight.discovery), label: l10n.translate('global_spotlight_nav')),
-            NavigationDestination(icon: const Icon(IconlyLight.category), label: l10n.translate('inventory_nav')),
-            NavigationDestination(icon: const Icon(IconlyLight.setting), label: l10n.translate('settings')),
+            onDestinationSelected: (value) {
+              setState(() => _index = value);
+            },
+            destinations: [
+              NavigationDestination(icon: const Icon(IconlyLight.home), label: l10n.translate('home')),
+              NavigationDestination(icon: const Icon(IconlyLight.activity), label: l10n.translate('briefing_nav')),
+              NavigationDestination(icon: const Icon(IconlyLight.chart), label: l10n.translate('forecast_nav')),
+              NavigationDestination(icon: const Icon(IconlyLight.document), label: l10n.translate('scenario_nav')),
+              NavigationDestination(icon: const Icon(IconlyLight.search), label: l10n.translate('search')),
+              NavigationDestination(icon: const Icon(IconlyLight.calendar), label: l10n.translate('on_this_day_nav')),
+              NavigationDestination(icon: const Icon(IconlyLight.discovery), label: l10n.translate('global_spotlight_nav')),
+              NavigationDestination(icon: const Icon(IconlyLight.category), label: l10n.translate('inventory_nav')),
+              NavigationDestination(icon: const Icon(IconlyLight.setting), label: l10n.translate('settings')),
             ],
           ),
         );

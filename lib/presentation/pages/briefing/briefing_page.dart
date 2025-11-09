@@ -29,6 +29,7 @@ class BriefingPage extends StatelessWidget {
     required this.searchController,
     required this.onSelectTab,
     required this.onOpenForecast,
+    required this.onOpenScenario,
   });
 
   final AppRouterState routerState;
@@ -41,6 +42,7 @@ class BriefingPage extends StatelessWidget {
   final SearchPageController searchController;
   final ValueChanged<int> onSelectTab;
   final VoidCallback onOpenForecast;
+  final VoidCallback onOpenScenario;
 
   @override
   Widget build(BuildContext context) {
@@ -97,13 +99,14 @@ class BriefingPage extends StatelessWidget {
               const SizedBox(height: 24),
               _QuickActions(
                 l10n: l10n,
-                onShowSearch: () => onSelectTab(3),
+                onShowSearch: () => onSelectTab(4),
                 onOpenIngest: () => routerState.push(AppPage.ingest),
-                onShowTimeline: () => onSelectTab(4),
-                onShowInventory: () => onSelectTab(6),
+                onShowTimeline: () => onSelectTab(5),
+                onShowInventory: () => onSelectTab(7),
                 onOpenTrends: () => routerState.push(AppPage.trends),
                 onOpenShare: () => routerState.push(AppPage.sharePoster),
                 onOpenForecast: onOpenForecast,
+                onOpenScenario: onOpenScenario,
               ),
               if (categoryStats.isNotEmpty) ...[
                 const SizedBox(height: 24),
@@ -270,6 +273,7 @@ class _QuickActions extends StatelessWidget {
     required this.onOpenTrends,
     required this.onOpenShare,
     required this.onOpenForecast,
+    required this.onOpenScenario,
   });
 
   final AppLocalizations l10n;
@@ -280,11 +284,13 @@ class _QuickActions extends StatelessWidget {
   final VoidCallback onOpenTrends;
   final VoidCallback onOpenShare;
   final VoidCallback onOpenForecast;
+  final VoidCallback onOpenScenario;
 
   @override
   Widget build(BuildContext context) {
     final actions = [
       _QuickAction(IconlyLight.chart, l10n.translate('briefing_action_forecast'), onOpenForecast),
+      _QuickAction(IconlyLight.document, l10n.translate('briefing_action_scenario'), onOpenScenario),
       _QuickAction(IconlyLight.search, l10n.translate('briefing_action_search'), onShowSearch),
       _QuickAction(IconlyLight.edit, l10n.translate('briefing_action_ingest'), onOpenIngest),
       _QuickAction(IconlyLight.calendar, l10n.translate('briefing_action_on_this_day'), onShowTimeline),

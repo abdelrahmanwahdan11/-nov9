@@ -96,6 +96,7 @@ class AppLocalizations {
     'home': {'en': 'Home', 'ar': 'الرئيسية'},
     'briefing_nav': {'en': 'Briefing', 'ar': 'الموجز'},
     'forecast_nav': {'en': 'Forecast', 'ar': 'التوقعات'},
+    'scenario_nav': {'en': 'Scenarios', 'ar': 'السيناريوهات'},
     'briefing_title': {'en': 'Command Center', 'ar': 'مركز التحكم'},
     'briefing_intro': {
       'en': 'Review highlights, saved filters, and collection insights in one place.',
@@ -107,6 +108,7 @@ class AppLocalizations {
     'briefing_metric_none': {'en': '—', 'ar': '—'},
     'briefing_quick_actions': {'en': 'Quick actions', 'ar': 'إجراءات سريعة'},
     'briefing_action_forecast': {'en': 'Forecast lab', 'ar': 'مختبر التوقعات'},
+    'briefing_action_scenario': {'en': 'Scenario studio', 'ar': 'استوديو السيناريو'},
     'briefing_action_search': {'en': 'Search feed', 'ar': 'بحث في الملخص'},
     'briefing_action_ingest': {'en': 'Parse article', 'ar': 'تحليل مقال'},
     'briefing_action_on_this_day': {'en': 'Historic moments', 'ar': 'أحداث اليوم التاريخية'},
@@ -198,6 +200,85 @@ class AppLocalizations {
     'forecast_suggestion_rebalance': {
       'en': 'Momentum is softening; rebalance your focus mix.',
       'ar': 'الزخم يضعف؛ أعد توازن مزيج التركيز.'
+    },
+    'scenario_lab_title': {'en': 'Scenario Studio', 'ar': 'استوديو السيناريو'},
+    'scenario_reset': {'en': 'Reset factors', 'ar': 'إعادة ضبط العوامل'},
+    'scenario_header_title': {'en': 'Strategic blueprint', 'ar': 'مخطط استراتيجي'},
+    'scenario_header_focus': {
+      'en': 'Currently tuned for {focus}',
+      'ar': 'مضبوط حاليًا على {focus}',
+    },
+    'scenario_header_ambition': {
+      'en': 'Ambition {value}%',
+      'ar': 'الطموح {value}%'
+    },
+    'scenario_header_resilience': {
+      'en': 'Resilience {value}%',
+      'ar': 'المرونة {value}%'
+    },
+    'scenario_controls_focus': {'en': 'Focus lens', 'ar': 'عدسة التركيز'},
+    'scenario_controls_ambition': {'en': 'Ambition', 'ar': 'الطموح'},
+    'scenario_controls_resilience': {'en': 'Resilience', 'ar': 'المرونة'},
+    'scenario_focus_politics': {'en': 'Politics', 'ar': 'سياسة'},
+    'scenario_focus_arts': {'en': 'Arts & Culture', 'ar': 'فنون وثقافة'},
+    'scenario_focus_world': {'en': 'World', 'ar': 'عالمي'},
+    'scenario_focus_collection': {'en': 'Collection', 'ar': 'المجموعة'},
+    'scenario_focus_hybrid': {'en': 'Hybrid mix', 'ar': 'مزيج هجين'},
+    'scenario_type_accelerate': {'en': 'Acceleration path', 'ar': 'مسار تسارع'},
+    'scenario_type_stabilize': {'en': 'Stabilization plan', 'ar': 'خطة استقرار'},
+    'scenario_type_diversify': {'en': 'Diversification', 'ar': 'تنويع'},
+    'scenario_risk_low': {'en': 'Low risk', 'ar': 'مخاطر منخفضة'},
+    'scenario_risk_medium': {'en': 'Moderate risk', 'ar': 'مخاطر متوسطة'},
+    'scenario_risk_high': {'en': 'High risk', 'ar': 'مخاطر مرتفعة'},
+    'scenario_plan_title': {'en': '{type} for {focus}', 'ar': '{type} لـ {focus}'},
+    'scenario_confidence': {'en': 'Confidence', 'ar': 'درجة الثقة'},
+    'scenario_drivers': {'en': 'Primary drivers', 'ar': 'محركات رئيسية'},
+    'scenario_watchlist': {'en': 'Watchlist signals', 'ar': 'إشارات للمراقبة'},
+    'scenario_actions': {'en': 'Next moves', 'ar': 'خطوات قادمة'},
+    'scenario_empty_title': {'en': 'No scenarios yet', 'ar': 'لا توجد سيناريوهات بعد'},
+    'scenario_empty_message': {
+      'en': 'Pull in more stories or adjust the controls to generate scenario blueprints.',
+      'ar': 'أضف المزيد من القصص أو عدّل الإعدادات لإنشاء مخططات سيناريو.',
+    },
+    'scenario_footer_disclaimer': {
+      'en': 'Simulated for planning only — no external data required.',
+      'ar': 'محاكاة للتخطيط فقط — بدون أي بيانات خارجية.',
+    },
+    'scenario_action_activate_briefings': {
+      'en': 'Activate targeted briefings for {focus} stakeholders.',
+      'ar': 'فعّل الإحاطات الموجهة لأصحاب المصلحة في {focus}.',
+    },
+    'scenario_action_surface_signals': {
+      'en': 'Surface the strongest signals in your digest feed.',
+      'ar': 'أبرز أقوى الإشارات داخل ملخصك.',
+    },
+    'scenario_action_launch_spotlight': {
+      'en': 'Launch a spotlight package dedicated to {focus} coverage.',
+      'ar': 'أطلق حزمة تركيز مخصصة لتغطية {focus}.',
+    },
+    'scenario_action_strengthen_monitoring': {
+      'en': 'Strengthen monitoring cadence for emerging signals.',
+      'ar': 'عزز وتيرة المراقبة للإشارات الناشئة.',
+    },
+    'scenario_action_pair_advisors': {
+      'en': 'Pair advisors to co-own the {focus} response.',
+      'ar': 'قم بمواءمة المستشارين ليتقاسموا استجابة {focus}.',
+    },
+    'scenario_action_resilience_drills': {
+      'en': 'Schedule resilience drills with your team.',
+      'ar': 'حدد تمارين مرونة للفريق.',
+    },
+    'scenario_action_crosslink_collection': {
+      'en': 'Cross-link related collectibles to enrich context.',
+      'ar': 'اربط المقتنيات ذات الصلة لإثراء السياق.',
+    },
+    'scenario_action_expand_partnerships': {
+      'en': 'Expand partnerships with {count} aligned contributors.',
+      'ar': 'وسع الشراكات مع {count} من الشركاء المتوافقين.',
+    },
+    'scenario_action_showcase_items': {
+      'en': 'Showcase {name} in the next collection feature.',
+      'ar': 'اعرض {name} في ميزة المجموعة القادمة.',
     },
     'search': {'en': 'Search', 'ar': 'بحث'},
     'on_this_day': {'en': 'On This Day', 'ar': 'في مثل هذا اليوم'},
