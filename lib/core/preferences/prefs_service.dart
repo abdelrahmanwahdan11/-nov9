@@ -15,6 +15,7 @@ class PrefsKeys {
   static const savedFilters = 'saved_filters';
   static const seenTips = 'seen_tips';
   static const completedOnboarding = 'completed_onboarding';
+  static const strategyNotes = 'strategy_notes';
 }
 
 class PrefsService {
@@ -108,6 +109,19 @@ class PrefsService {
     await _prefs.setString(PrefsKeys.savedFilters, jsonEncode(filters));
   }
 
+  List<Map<String, dynamic>> loadStrategyNotes() {
+    final raw = _prefs.getString(PrefsKeys.strategyNotes);
+    if (raw == null || raw.isEmpty) {
+      return const [];
+    }
+    final decoded = jsonDecode(raw) as List<dynamic>;
+    return decoded.map((entry) => Map<String, dynamic>.from(entry as Map)).toList();
+  }
+
+  Future<void> saveStrategyNotes(List<Map<String, dynamic>> notes) async {
+    await _prefs.setString(PrefsKeys.strategyNotes, jsonEncode(notes));
+  }
+
   List<String> get seenTips => _prefs.getStringList(PrefsKeys.seenTips) ?? <String>[];
 
   Future<void> setSeenTips(List<String> tips) async {
@@ -123,6 +137,7 @@ class PrefsService {
 
   Future<void> clearMockData() async {
     await _prefs.remove(PrefsKeys.items);
+    await _prefs.remove(PrefsKeys.strategyNotes);
   }
 
   Future<void> saveItems(List<Map<String, dynamic>> items) async {
@@ -149,6 +164,7 @@ class PrefsService {
       PrefsKeys.savedFilters: _prefs.getString(PrefsKeys.savedFilters),
       PrefsKeys.seenTips: _prefs.getStringList(PrefsKeys.seenTips),
       PrefsKeys.completedOnboarding: _prefs.getBool(PrefsKeys.completedOnboarding),
+      PrefsKeys.strategyNotes: _prefs.getString(PrefsKeys.strategyNotes),
     };
     return jsonEncode(backup);
   }

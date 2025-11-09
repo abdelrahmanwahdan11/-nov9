@@ -15,6 +15,8 @@ import '../../controllers/items_controller.dart';
 import '../../controllers/on_this_day_controller.dart';
 import '../../controllers/search_controller.dart';
 import '../../controllers/trends_controller.dart';
+import '../../controllers/notebook_controller.dart';
+import '../../../data/models/strategy_note.dart';
 
 class BriefingPage extends StatelessWidget {
   const BriefingPage({
@@ -30,6 +32,8 @@ class BriefingPage extends StatelessWidget {
     required this.onSelectTab,
     required this.onOpenForecast,
     required this.onOpenScenario,
+    required this.notebookController,
+    required this.onOpenNotebook,
   });
 
   final AppRouterState routerState;
@@ -43,6 +47,8 @@ class BriefingPage extends StatelessWidget {
   final ValueChanged<int> onSelectTab;
   final VoidCallback onOpenForecast;
   final VoidCallback onOpenScenario;
+  final NotebookController notebookController;
+  final VoidCallback onOpenNotebook;
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +60,7 @@ class BriefingPage extends StatelessWidget {
         bookmarksController,
         onThisDayController,
         filtersController,
+        notebookController,
       ]),
       builder: (context, _) {
         final l10n = AppLocalizations.of(context);
@@ -74,6 +81,7 @@ class BriefingPage extends StatelessWidget {
             .toList();
         final trackedItems = itemsController.items;
         final timelinePreview = onThisDayController.events;
+        final notebookEntries = notebookController.notes;
 
         return Scaffold(
           appBar: AppBar(
@@ -107,6 +115,7 @@ class BriefingPage extends StatelessWidget {
                 onOpenShare: () => routerState.push(AppPage.sharePoster),
                 onOpenForecast: onOpenForecast,
                 onOpenScenario: onOpenScenario,
+                onOpenNotebook: onOpenNotebook,
               ),
               if (categoryStats.isNotEmpty) ...[
                 const SizedBox(height: 24),
@@ -134,6 +143,13 @@ class BriefingPage extends StatelessWidget {
                 items: trackedItems,
                 l10n: l10n,
                 onOpenInventory: () => onSelectTab(6),
+              ),
+              const SizedBox(height: 24),
+              _NotebookPreview(
+                l10n: l10n,
+                notes: notebookEntries,
+                controller: notebookController,
+                onOpenNotebook: onOpenNotebook,
               ),
               const SizedBox(height: 24),
               _HistoricalPreview(
@@ -274,6 +290,7 @@ class _QuickActions extends StatelessWidget {
     required this.onOpenShare,
     required this.onOpenForecast,
     required this.onOpenScenario,
+    required this.onOpenNotebook,
   });
 
   final AppLocalizations l10n;
@@ -285,6 +302,7 @@ class _QuickActions extends StatelessWidget {
   final VoidCallback onOpenShare;
   final VoidCallback onOpenForecast;
   final VoidCallback onOpenScenario;
+  final VoidCallback onOpenNotebook;
 
   @override
   Widget build(BuildContext context) {
@@ -297,6 +315,7 @@ class _QuickActions extends StatelessWidget {
       _QuickAction(IconlyLight.category, l10n.translate('briefing_action_inventory'), onShowInventory),
       _QuickAction(IconlyLight.activity, l10n.translate('briefing_action_trends'), onOpenTrends),
       _QuickAction(IconlyLight.send, l10n.translate('briefing_action_share'), onOpenShare),
+      _QuickAction(IconlyLight.paper, l10n.translate('briefing_action_notebook'), onOpenNotebook),
     ];
     final theme = Theme.of(context);
     return Column(
@@ -332,6 +351,219 @@ class _QuickAction {
   final IconData icon;
   final String label;
   final VoidCallback onPressed;
+}
+
+class _NotebookPreview extends StatelessWidget {
+  const _NotebookPreview({
+    required this.l10n,
+    required this.notes,
+    required this.controller,
+    required this.onOpenNotebook,
+  });
+
+  final AppLocalizations l10n;
+  final List<StrategyNote> notes;
+  final NotebookController controller;
+  final VoidCallback onOpenNotebook;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final averageConfidence = controller.averageConfidence;
+    final highlightNotes = notes
+        .toList()
+      ..sort((a, b) => b.effectiveDate.compareTo(a.effectiveDate));
+    final topEntries = highlightNotes.take(3).toList();
+    final tagHeat = controller.tagHeat.take(4).toList();
+    final topConfidence = controller.topConfidenceNote;
+
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+      elevation: 0,
+      color: theme.colorScheme.surfaceVariant.withOpacity(0.4),
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    l10n.translate('notebook_overview_title'),
+                    style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                  ),
+                ),
+                TextButton(
+                  onPressed: onOpenNotebook,
+                  child: Text(l10n.translate('notebook_open_full')),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            if (notes.isEmpty)
+              Text(
+                l10n.translate('notebook_empty_preview'),
+                style: theme.textTheme.bodyMedium,
+              )
+            else ...[
+              Text(
+                l10n.translateWithArgs(
+                  'notebook_summary_metric',
+                  {
+                    'count': notes.length.toString(),
+                    'confidence': (averageConfidence * 100).toStringAsFixed(0),
+                  },
+                ),
+                style: theme.textTheme.bodyMedium,
+              ),
+              const SizedBox(height: 12),
+              LinearProgressIndicator(
+                value: averageConfidence.clamp(0.0, 1.0),
+                minHeight: 6,
+                backgroundColor: theme.colorScheme.onSurface.withOpacity(0.1),
+              ),
+              const SizedBox(height: 16),
+              if (topConfidence != null)
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surface.withOpacity(0.6),
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.translate('notebook_top_confidence_title'),
+                        style: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(topConfidence.title, style: theme.textTheme.titleSmall),
+                      const SizedBox(height: 4),
+                      Text(
+                        controller.confidenceLabel(l10n, topConfidence.confidence),
+                        style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.primary),
+                      ),
+                    ],
+                  ),
+                ),
+              const SizedBox(height: 16),
+              if (tagHeat.isNotEmpty)
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: tagHeat
+                      .map(
+                        (entry) => Chip(
+                          label: Text('#${entry.key} · ${entry.value}'),
+                          visualDensity: VisualDensity.comfortable,
+                        ),
+                      )
+                      .toList(),
+                ),
+              if (tagHeat.isNotEmpty) const SizedBox(height: 16),
+              ...topEntries.map(
+                (note) => Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: _NotebookPreviewTile(
+                    note: note,
+                    controller: controller,
+                    l10n: l10n,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _NotebookPreviewTile extends StatelessWidget {
+  const _NotebookPreviewTile({
+    required this.note,
+    required this.controller,
+    required this.l10n,
+  });
+
+  final StrategyNote note;
+  final NotebookController controller;
+  final AppLocalizations l10n;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color = controller.confidenceColor(theme, note.confidence);
+
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        color: theme.colorScheme.surface,
+        boxShadow: [
+          BoxShadow(
+            color: theme.colorScheme.shadow.withOpacity(0.05),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                controller.focusLabel(l10n, note.focus),
+                style: theme.textTheme.labelMedium?.copyWith(color: color, fontWeight: FontWeight.w700),
+              ),
+              Text(
+                l10n.translateWithArgs(
+                  'notebook_updated_label',
+                  {'time': _timeAgo(l10n, note.effectiveDate)},
+                ),
+                style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurface.withOpacity(0.6)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(note.title, style: theme.textTheme.titleSmall),
+          const SizedBox(height: 6),
+          Text(
+            note.summary,
+            style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurface.withOpacity(0.7)),
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: note.tags
+                .map((tag) => Chip(
+                      label: Text('#$tag'),
+                      backgroundColor: color.withOpacity(0.08),
+                    ))
+                .toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _timeAgo(AppLocalizations l10n, DateTime date) {
+    final now = DateTime.now();
+    final difference = now.difference(date);
+    if (difference.inMinutes < 1) {
+      return l10n.translate('time_just_now');
+    } else if (difference.inMinutes < 60) {
+      return l10n.translateWithArgs('time_minutes', {'value': difference.inMinutes.toString()});
+    } else if (difference.inHours < 24) {
+      return l10n.translateWithArgs('time_hours', {'value': difference.inHours.toString()});
+    }
+    return l10n.translateWithArgs('time_days', {'value': difference.inDays.toString()});
+  }
 }
 
 class _CategoryBreakdown extends StatelessWidget {

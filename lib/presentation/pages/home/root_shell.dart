@@ -15,6 +15,7 @@ import '../../controllers/settings_controller.dart';
 import '../../controllers/trends_controller.dart';
 import '../../controllers/forecast_controller.dart';
 import '../../controllers/scenario_controller.dart';
+import '../../controllers/notebook_controller.dart';
 import '../briefing/briefing_page.dart';
 import '../forecast/forecast_lab_page.dart';
 import '../inventory/inventory_page.dart';
@@ -41,6 +42,7 @@ class RootShell extends StatefulWidget {
     required this.onThisDayController,
     required this.forecastController,
     required this.scenarioController,
+    required this.notebookController,
     this.startIndex = 0,
   });
 
@@ -57,6 +59,7 @@ class RootShell extends StatefulWidget {
   final OnThisDayController onThisDayController;
   final ForecastController forecastController;
   final ScenarioController scenarioController;
+  final NotebookController notebookController;
   final int startIndex;
 
   @override
@@ -84,6 +87,7 @@ class _RootShellState extends State<RootShell> {
         widget.filtersController,
         widget.forecastController,
         widget.scenarioController,
+        widget.notebookController,
       ]),
       builder: (context, _) {
         final l10n = AppLocalizations.of(context);
@@ -109,9 +113,11 @@ class _RootShellState extends State<RootShell> {
             onThisDayController: widget.onThisDayController,
             filtersController: widget.filtersController,
             searchController: widget.searchController,
+            notebookController: widget.notebookController,
             onSelectTab: (value) => setState(() => _index = value),
             onOpenForecast: () => setState(() => _index = 2),
             onOpenScenario: () => setState(() => _index = 3),
+            onOpenNotebook: () => widget.routerState.push(AppPage.notebook),
           ),
           ForecastLabPage(controller: widget.forecastController),
           ScenarioPlannerPage(controller: widget.scenarioController),
@@ -135,6 +141,7 @@ class _RootShellState extends State<RootShell> {
             onOpenTrends: () => widget.routerState.push(AppPage.trends),
             onOpenHelp: () => widget.routerState.push(AppPage.help),
             onOpenSharePoster: () => widget.routerState.push(AppPage.sharePoster),
+            onOpenNotebook: () => widget.routerState.push(AppPage.notebook),
           ),
         ];
 

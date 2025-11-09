@@ -17,6 +17,7 @@ class SettingsPage extends StatefulWidget {
     this.onOpenTrends,
     this.onOpenHelp,
     this.onOpenSharePoster,
+    this.onOpenNotebook,
   });
 
   final SettingsController controller;
@@ -28,6 +29,7 @@ class SettingsPage extends StatefulWidget {
   final VoidCallback? onOpenTrends;
   final VoidCallback? onOpenHelp;
   final VoidCallback? onOpenSharePoster;
+  final VoidCallback? onOpenNotebook;
 
   @override
   State<SettingsPage> createState() => _SettingsPageState();
@@ -184,6 +186,12 @@ class _SettingsPageState extends State<SettingsPage> {
                 leading: const Icon(IconlyLight.activity),
                 title: Text(l10n.translate('trends')),
                 onTap: widget.onOpenTrends,
+              ),
+              ListTile(
+                leading: const Icon(IconlyLight.document),
+                title: Text(l10n.translate('notebook')),
+                subtitle: Text(l10n.translate('notebook_settings_description')),
+                onTap: widget.onOpenNotebook,
               ),
               ListTile(
                 leading: const Icon(IconlyLight.send),

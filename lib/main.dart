@@ -13,6 +13,7 @@ import 'data/services/stats_service.dart';
 import 'data/services/on_this_day_service.dart';
 import 'data/services/forecast_service.dart';
 import 'data/services/scenario_service.dart';
+import 'data/services/notebook_service.dart';
 import 'domain/usecases/get_events_usecase.dart';
 import 'domain/usecases/get_items_usecase.dart';
 import 'domain/usecases/item_management_usecase.dart';
@@ -20,6 +21,7 @@ import 'domain/usecases/refresh_events_usecase.dart';
 import 'domain/usecases/search_usecase.dart';
 import 'domain/usecases/get_on_this_day_usecase.dart';
 import 'domain/usecases/get_scenarios_usecase.dart';
+import 'domain/usecases/manage_notes_usecase.dart';
 import 'presentation/controllers/auth_controller.dart';
 import 'presentation/controllers/bookmarks_controller.dart';
 import 'presentation/controllers/filters_controller.dart';
@@ -27,6 +29,7 @@ import 'presentation/controllers/events_controller.dart';
 import 'presentation/controllers/history_controller.dart';
 import 'presentation/controllers/forecast_controller.dart';
 import 'presentation/controllers/items_controller.dart';
+import 'presentation/controllers/notebook_controller.dart';
 import 'presentation/controllers/overlay_controller.dart';
 import 'presentation/controllers/search_controller.dart';
 import 'presentation/controllers/settings_controller.dart';
@@ -52,6 +55,7 @@ import 'presentation/pages/sources/sources_page.dart';
 import 'presentation/pages/topics/topics_page.dart';
 import 'presentation/pages/trends/trends_page.dart';
 import 'presentation/pages/scenario/scenario_planner_page.dart';
+import 'presentation/pages/notebook/strategy_notebook_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -82,7 +86,11 @@ void main() async {
     eventsController,
     itemsController,
   );
+  final notebookController = NotebookController(
+    ManageNotesUseCase(NotebookService(prefs)),
+  );
   await onThisDayController.load(force: true);
+  await notebookController.initialize();
   eventsController.addListener(() {
     trendsController.update(eventsController.events);
   });
@@ -107,6 +115,7 @@ void main() async {
           onThisDayController: onThisDayController,
           forecastController: forecastController,
           scenarioController: scenarioController,
+          notebookController: notebookController,
         ),
     AppPage.briefing: (context) => RootShell(
           routerState: routerState,
@@ -122,6 +131,7 @@ void main() async {
           onThisDayController: onThisDayController,
           forecastController: forecastController,
           scenarioController: scenarioController,
+          notebookController: notebookController,
           startIndex: 1,
         ),
     AppPage.forecast: (context) => RootShell(
@@ -138,6 +148,7 @@ void main() async {
           onThisDayController: onThisDayController,
           forecastController: forecastController,
           scenarioController: scenarioController,
+          notebookController: notebookController,
           startIndex: 2,
         ),
     AppPage.scenario: (context) => RootShell(
@@ -154,6 +165,7 @@ void main() async {
           onThisDayController: onThisDayController,
           forecastController: forecastController,
           scenarioController: scenarioController,
+          notebookController: notebookController,
           startIndex: 3,
         ),
     AppPage.search: (context) => SearchPage(
@@ -163,23 +175,8 @@ void main() async {
           items: itemsController.items,
           bookmarksController: bookmarksController,
         ),
+    AppPage.notebook: (context) => StrategyNotebookPage(controller: notebookController),
     AppPage.spotlight: (context) => RootShell(
-          routerState: routerState,
-          eventsController: eventsController,
-          overlayController: overlayController,
-          itemsController: itemsController,
-          settingsController: settingsController,
-          searchController: searchController,
-          filtersController: filtersController,
-          parser: localParser,
-          startIndex: 5,
-          trendsController: trendsController,
-          bookmarksController: bookmarksController,
-          onThisDayController: onThisDayController,
-          forecastController: forecastController,
-          scenarioController: scenarioController,
-        ),
-    AppPage.inventory: (context) => RootShell(
           routerState: routerState,
           eventsController: eventsController,
           overlayController: overlayController,
@@ -194,6 +191,24 @@ void main() async {
           onThisDayController: onThisDayController,
           forecastController: forecastController,
           scenarioController: scenarioController,
+          notebookController: notebookController,
+        ),
+    AppPage.inventory: (context) => RootShell(
+          routerState: routerState,
+          eventsController: eventsController,
+          overlayController: overlayController,
+          itemsController: itemsController,
+          settingsController: settingsController,
+          searchController: searchController,
+          filtersController: filtersController,
+          parser: localParser,
+          startIndex: 7,
+          trendsController: trendsController,
+          bookmarksController: bookmarksController,
+          onThisDayController: onThisDayController,
+          forecastController: forecastController,
+          scenarioController: scenarioController,
+          notebookController: notebookController,
         ),
     AppPage.onThisDay: (context) => RootShell(
           routerState: routerState,
@@ -204,16 +219,20 @@ void main() async {
           searchController: searchController,
           filtersController: filtersController,
           parser: localParser,
-          startIndex: 4,
+          startIndex: 5,
           trendsController: trendsController,
           bookmarksController: bookmarksController,
           onThisDayController: onThisDayController,
           forecastController: forecastController,
           scenarioController: scenarioController,
+          notebookController: notebookController,
         ),
     AppPage.ingest: (context) => IngestArticlePage(parser: localParser, eventsController: eventsController),
     AppPage.notifications: (context) => NotificationsPage(itemsController: itemsController),
-    AppPage.settings: (context) => SettingsPage(controller: settingsController),
+    AppPage.settings: (context) => SettingsPage(
+          controller: settingsController,
+          onOpenNotebook: () => routerState.push(AppPage.notebook),
+        ),
     AppPage.history: (context) => HistoryPage(
           controller: historyController,
           eventsController: eventsController,
