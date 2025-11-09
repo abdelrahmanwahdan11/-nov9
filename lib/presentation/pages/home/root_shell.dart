@@ -47,6 +47,7 @@ class RootShell extends StatefulWidget {
     required this.notebookController,
     required this.riskController,
     this.startIndex = 0,
+    this.initialMenuKey,
   });
 
   final AppRouterState routerState;
@@ -65,18 +66,24 @@ class RootShell extends StatefulWidget {
   final NotebookController notebookController;
   final RiskController riskController;
   final int startIndex;
+  final String? initialMenuKey;
 
   @override
   State<RootShell> createState() => _RootShellState();
 }
 
 class _RootShellState extends State<RootShell> {
+  static const _menuIndex = 4;
   late int _index;
+  late String _currentMenuKey;
+  late String _pinnedMenuKey;
 
   @override
   void initState() {
     super.initState();
     _index = widget.startIndex;
+    _currentMenuKey = widget.initialMenuKey ?? 'briefing';
+    _pinnedMenuKey = _currentMenuKey;
   }
 
   @override
@@ -96,6 +103,16 @@ class _RootShellState extends State<RootShell> {
       ]),
       builder: (context, _) {
         final l10n = AppLocalizations.of(context);
+        final menuEntries = _buildMenuEntries(l10n);
+        if (menuEntries.isNotEmpty) {
+          if (!menuEntries.any((entry) => entry.key == _currentMenuKey)) {
+            _currentMenuKey = menuEntries.first.key;
+          }
+          if (!menuEntries.any((entry) => entry.key == _pinnedMenuKey)) {
+            _pinnedMenuKey = _currentMenuKey;
+          }
+        }
+
         final pages = [
           HomePage(
             eventsController: widget.eventsController,
@@ -109,26 +126,6 @@ class _RootShellState extends State<RootShell> {
             onOpenSources: () => widget.routerState.push(AppPage.sources),
             trendsController: widget.trendsController,
           ),
-          BriefingPage(
-            routerState: widget.routerState,
-            eventsController: widget.eventsController,
-            itemsController: widget.itemsController,
-            trendsController: widget.trendsController,
-            bookmarksController: widget.bookmarksController,
-            onThisDayController: widget.onThisDayController,
-            filtersController: widget.filtersController,
-            searchController: widget.searchController,
-            notebookController: widget.notebookController,
-            onSelectTab: (value) => setState(() => _index = value),
-            onOpenForecast: () => setState(() => _index = 2),
-            onOpenScenario: () => setState(() => _index = 3),
-            onOpenNotebook: () => widget.routerState.push(AppPage.notebook),
-            onOpenRisk: () => setState(() => _index = 4),
-            riskController: widget.riskController,
-          ),
-          ForecastLabPage(controller: widget.forecastController),
-          ScenarioPlannerPage(controller: widget.scenarioController),
-          RiskDashboardPage(controller: widget.riskController),
           SearchPage(
             controller: widget.searchController,
             filtersController: widget.filtersController,
@@ -137,8 +134,6 @@ class _RootShellState extends State<RootShell> {
             bookmarksController: widget.bookmarksController,
           ),
           OnThisDayPage(controller: widget.onThisDayController),
-          GlobalSpotlightPage(controller: widget.onThisDayController),
-          InventoryPage(controller: widget.itemsController),
           SettingsPage(
             controller: widget.settingsController,
             onOpenNotifications: () => widget.routerState.push(AppPage.notifications),
@@ -151,6 +146,11 @@ class _RootShellState extends State<RootShell> {
             onOpenSharePoster: () => widget.routerState.push(AppPage.sharePoster),
             onOpenNotebook: () => widget.routerState.push(AppPage.notebook),
           ),
+          _MenuSwitcher(
+            entries: menuEntries,
+            currentKey: _currentMenuKey,
+            onSelect: (key) => setState(() => _currentMenuKey = key),
+          ),
         ];
 
         return Scaffold(
@@ -158,23 +158,265 @@ class _RootShellState extends State<RootShell> {
           bottomNavigationBar: NavigationBar(
             selectedIndex: _index,
             onDestinationSelected: (value) {
-              setState(() => _index = value);
+              if (value == _menuIndex) {
+                if (menuEntries.isNotEmpty) {
+                  setState(() {
+                    _index = _menuIndex;
+                    _currentMenuKey = menuEntries
+                        .firstWhere(
+                          (entry) => entry.key == _pinnedMenuKey,
+                          orElse: () => menuEntries.first,
+                        )
+                        .key;
+                  });
+                } else {
+                  setState(() => _index = _menuIndex);
+                }
+              } else {
+                setState(() => _index = value);
+              }
             },
             destinations: [
               NavigationDestination(icon: const Icon(IconlyLight.home), label: l10n.translate('home')),
-              NavigationDestination(icon: const Icon(IconlyLight.activity), label: l10n.translate('briefing_nav')),
-              NavigationDestination(icon: const Icon(IconlyLight.chart), label: l10n.translate('forecast_nav')),
-              NavigationDestination(icon: const Icon(IconlyLight.document), label: l10n.translate('scenario_nav')),
-              NavigationDestination(icon: const Icon(IconlyLight.shield_done), label: l10n.translate('risk_nav')),
               NavigationDestination(icon: const Icon(IconlyLight.search), label: l10n.translate('search')),
               NavigationDestination(icon: const Icon(IconlyLight.calendar), label: l10n.translate('on_this_day_nav')),
-              NavigationDestination(icon: const Icon(IconlyLight.discovery), label: l10n.translate('global_spotlight_nav')),
-              NavigationDestination(icon: const Icon(IconlyLight.category), label: l10n.translate('inventory_nav')),
               NavigationDestination(icon: const Icon(IconlyLight.setting), label: l10n.translate('settings')),
+              NavigationDestination(
+                icon: _MenuDestinationIcon(
+                  icon: IconlyLight.category,
+                  isSelected: _index == _menuIndex,
+                  onLongPress: () => _showMenuPicker(menuEntries),
+                ),
+                label: l10n.translate('menu_nav'),
+              ),
             ],
           ),
         );
       },
+    );
+  }
+ 
+  List<_MenuEntry> _buildMenuEntries(AppLocalizations l10n) {
+    return [
+      _MenuEntry(
+        key: 'briefing',
+        icon: IconlyLight.activity,
+        label: l10n.translate('briefing_nav'),
+        builder: (context) => BriefingPage(
+          routerState: widget.routerState,
+          eventsController: widget.eventsController,
+          itemsController: widget.itemsController,
+          trendsController: widget.trendsController,
+          bookmarksController: widget.bookmarksController,
+          onThisDayController: widget.onThisDayController,
+          filtersController: widget.filtersController,
+          searchController: widget.searchController,
+          notebookController: widget.notebookController,
+          onSelectTab: _handleBriefingShortcut,
+          onOpenForecast: () => _selectMenuEntry('forecast'),
+          onOpenScenario: () => _selectMenuEntry('scenario'),
+          onOpenNotebook: () => widget.routerState.push(AppPage.notebook),
+          onOpenRisk: () => _selectMenuEntry('risk'),
+          riskController: widget.riskController,
+        ),
+      ),
+      _MenuEntry(
+        key: 'forecast',
+        icon: IconlyLight.chart,
+        label: l10n.translate('forecast_nav'),
+        builder: (context) => ForecastLabPage(controller: widget.forecastController),
+      ),
+      _MenuEntry(
+        key: 'scenario',
+        icon: IconlyLight.document,
+        label: l10n.translate('scenario_nav'),
+        builder: (context) => ScenarioPlannerPage(controller: widget.scenarioController),
+      ),
+      _MenuEntry(
+        key: 'risk',
+        icon: IconlyLight.shield_done,
+        label: l10n.translate('risk_nav'),
+        builder: (context) => RiskDashboardPage(controller: widget.riskController),
+      ),
+      _MenuEntry(
+        key: 'spotlight',
+        icon: IconlyLight.discovery,
+        label: l10n.translate('global_spotlight_nav'),
+        builder: (context) => GlobalSpotlightPage(controller: widget.onThisDayController),
+      ),
+      _MenuEntry(
+        key: 'inventory',
+        icon: IconlyLight.category,
+        label: l10n.translate('inventory_nav'),
+        builder: (context) => InventoryPage(controller: widget.itemsController),
+      ),
+    ];
+  }
+
+  void _handleBriefingShortcut(int value) {
+    switch (value) {
+      case 5:
+        setState(() => _index = 1);
+        break;
+      case 6:
+        setState(() => _index = 2);
+        break;
+      case 8:
+        _selectMenuEntry('inventory');
+        break;
+      default:
+        break;
+    }
+  }
+
+  void _selectMenuEntry(String key) {
+    setState(() {
+      _index = _menuIndex;
+      _currentMenuKey = key;
+    });
+  }
+
+  void _showMenuPicker(List<_MenuEntry> entries) {
+    if (entries.isEmpty) return;
+    final l10n = AppLocalizations.of(context);
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                l10n.translate('menu_customize_title'),
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                l10n.translate('menu_customize_message'),
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              const SizedBox(height: 20),
+              ...entries.map(
+                (entry) => RadioListTile<String>(
+                  value: entry.key,
+                  groupValue: _pinnedMenuKey,
+                  onChanged: (value) {
+                    if (value == null) return;
+                    setState(() {
+                      _pinnedMenuKey = value;
+                      _currentMenuKey = value;
+                      _index = _menuIndex;
+                    });
+                    Navigator.of(context).pop();
+                  },
+                  title: Text(entry.label),
+                  secondary: Icon(entry.icon),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _MenuEntry {
+  const _MenuEntry({
+    required this.key,
+    required this.icon,
+    required this.label,
+    required this.builder,
+  });
+
+  final String key;
+  final IconData icon;
+  final String label;
+  final WidgetBuilder builder;
+}
+
+class _MenuSwitcher extends StatelessWidget {
+  const _MenuSwitcher({
+    required this.entries,
+    required this.currentKey,
+    required this.onSelect,
+  });
+
+  final List<_MenuEntry> entries;
+  final String currentKey;
+  final ValueChanged<String> onSelect;
+
+  @override
+  Widget build(BuildContext context) {
+    if (entries.isEmpty) {
+      return const SizedBox();
+    }
+
+    final activeEntry = entries.firstWhere(
+      (entry) => entry.key == currentKey,
+      orElse: () => entries.first,
+    );
+
+    return Column(
+      children: [
+        SizedBox(
+          height: 72,
+          child: ListView.separated(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            itemBuilder: (context, index) {
+              final entry = entries[index];
+              final isActive = entry.key == activeEntry.key;
+              return ChoiceChip(
+                selected: isActive,
+                avatar: Icon(entry.icon, size: 18),
+                label: Text(entry.label),
+                onSelected: (_) => onSelect(entry.key),
+              );
+            },
+            separatorBuilder: (context, _) => const SizedBox(width: 12),
+            itemCount: entries.length,
+          ),
+        ),
+        const Divider(height: 1),
+        Expanded(
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            switchInCurve: Curves.easeOut,
+            switchOutCurve: Curves.easeIn,
+            child: KeyedSubtree(
+              key: ValueKey(activeEntry.key),
+              child: Builder(builder: activeEntry.builder),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _MenuDestinationIcon extends StatelessWidget {
+  const _MenuDestinationIcon({
+    required this.icon,
+    required this.isSelected,
+    required this.onLongPress,
+  });
+
+  final IconData icon;
+  final bool isSelected;
+  final VoidCallback onLongPress;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final color = isSelected ? colorScheme.onPrimary : colorScheme.onSurfaceVariant;
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onLongPress: onLongPress,
+      child: Icon(icon, color: color),
     );
   }
 }

@@ -94,6 +94,7 @@ class AppLocalizations {
     'remember_me': {'en': 'Remember me', 'ar': 'تذكرني'},
     'continue_guest': {'en': 'Continue as guest', 'ar': 'المتابعة كضيف'},
     'home': {'en': 'Home', 'ar': 'الرئيسية'},
+    'menu_nav': {'en': 'Menu', 'ar': 'القائمة'},
     'briefing_nav': {'en': 'Briefing', 'ar': 'الموجز'},
     'forecast_nav': {'en': 'Forecast', 'ar': 'التوقعات'},
     'scenario_nav': {'en': 'Scenarios', 'ar': 'السيناريوهات'},
@@ -118,6 +119,14 @@ class AppLocalizations {
     'briefing_action_trends': {'en': 'View trends', 'ar': 'عرض الاتجاهات'},
     'briefing_action_share': {'en': 'Share poster', 'ar': 'مشاركة الملصق'},
     'briefing_action_notebook': {'en': 'Strategy notebook', 'ar': 'دفتر الاستراتيجيات'},
+    'menu_customize_title': {
+      'en': 'Choose menu shortcut',
+      'ar': 'اختر اختصار القائمة',
+    },
+    'menu_customize_message': {
+      'en': 'Long-press the menu tab anytime to pin a different destination.',
+      'ar': 'اضغط مطولًا على تبويب القائمة لتثبيت وجهة مختلفة في أي وقت.',
+    },
     'notebook': {'en': 'Strategy notebook', 'ar': 'دفتر الاستراتيجيات'},
     'notebook_nav': {'en': 'Notebook', 'ar': 'دفتر'},
     'risk_dashboard_title': {'en': 'Risk radar', 'ar': 'رادار المخاطر'},
