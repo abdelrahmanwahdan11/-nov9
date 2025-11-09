@@ -6,6 +6,7 @@ enum AppPage {
   auth,
   home,
   search,
+  onThisDay,
   catalog,
   myItems,
   ingest,

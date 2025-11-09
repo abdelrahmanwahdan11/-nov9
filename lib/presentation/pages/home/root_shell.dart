@@ -8,6 +8,7 @@ import '../../controllers/bookmarks_controller.dart';
 import '../../controllers/events_controller.dart';
 import '../../controllers/filters_controller.dart';
 import '../../controllers/items_controller.dart';
+import '../../controllers/on_this_day_controller.dart';
 import '../../controllers/overlay_controller.dart';
 import '../../controllers/search_controller.dart';
 import '../../controllers/settings_controller.dart';
@@ -16,6 +17,7 @@ import '../catalog/catalog_page.dart';
 import '../my_items/my_items_page.dart';
 import '../search/search_page.dart';
 import '../settings/settings_page.dart';
+import '../on_this_day/on_this_day_page.dart';
 import 'home_page.dart';
 
 class RootShell extends StatefulWidget {
@@ -31,6 +33,7 @@ class RootShell extends StatefulWidget {
     required this.parser,
     required this.bookmarksController,
     required this.trendsController,
+    required this.onThisDayController,
     this.startIndex = 0,
   });
 
@@ -44,6 +47,7 @@ class RootShell extends StatefulWidget {
   final LocalArticleParser parser;
   final BookmarksController bookmarksController;
   final TrendsController trendsController;
+  final OnThisDayController onThisDayController;
   final int startIndex;
 
   @override
@@ -67,6 +71,7 @@ class _RootShellState extends State<RootShell> {
         widget.itemsController,
         widget.settingsController,
         widget.bookmarksController,
+        widget.onThisDayController,
       ]),
       builder: (context, _) {
         final l10n = AppLocalizations.of(context);
@@ -90,6 +95,7 @@ class _RootShellState extends State<RootShell> {
             items: widget.itemsController.items,
             bookmarksController: widget.bookmarksController,
           ),
+          OnThisDayPage(controller: widget.onThisDayController),
           CatalogPage(controller: widget.itemsController),
           MyItemsPage(controller: widget.itemsController),
           SettingsPage(
@@ -115,6 +121,7 @@ class _RootShellState extends State<RootShell> {
             destinations: [
               NavigationDestination(icon: const Icon(IconlyLight.home), label: l10n.translate('home')),
               NavigationDestination(icon: const Icon(IconlyLight.search), label: l10n.translate('search')),
+              NavigationDestination(icon: const Icon(IconlyLight.calendar), label: l10n.translate('on_this_day_nav')),
               NavigationDestination(icon: const Icon(IconlyLight.category), label: l10n.translate('catalog')),
               NavigationDestination(icon: const Icon(IconlyLight.bag), label: l10n.translate('my_items')),
               NavigationDestination(icon: const Icon(IconlyLight.setting), label: l10n.translate('settings')),

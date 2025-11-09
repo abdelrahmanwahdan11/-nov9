@@ -65,6 +65,12 @@ class _CatalogPageState extends State<CatalogPage> {
                   _priceOf(item)! <= item.targetPrice! * 1.1,
             )
             .toList();
+        final forSaleShowcase = items.where((item) => item.forSale).take(6).toList();
+        var recentShowcase = items.reversed.where((item) => !item.forSale).take(6).toList();
+        if (recentShowcase.length < 3) {
+          recentShowcase = items.reversed.take(6).toList();
+        }
+        final reversedPalette = palette.reversed.toList();
 
         return Scaffold(
           appBar: AppBar(
@@ -115,6 +121,34 @@ class _CatalogPageState extends State<CatalogPage> {
                   ),
                 ),
               ),
+              if (forSaleShowcase.isNotEmpty)
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 0, 24),
+                    child: _SpotlightRail(
+                      title: l10n.translate('catalog_spotlight_for_sale'),
+                      subtitle: l10n.translate('catalog_spotlight_for_sale_subtitle'),
+                      items: forSaleShowcase,
+                      palette: palette,
+                      controller: widget.controller,
+                      onOpenQuickLook: (item) => _showQuickLook(context, item),
+                    ),
+                  ),
+                ),
+              if (recentShowcase.isNotEmpty)
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 0, 24),
+                    child: _SpotlightRail(
+                      title: l10n.translate('catalog_spotlight_recent'),
+                      subtitle: l10n.translate('catalog_spotlight_recent_subtitle'),
+                      items: recentShowcase,
+                      palette: reversedPalette,
+                      controller: widget.controller,
+                      onOpenQuickLook: (item) => _showQuickLook(context, item),
+                    ),
+                  ),
+                ),
               if (widget.controller.compareList.length == 2)
                 SliverPadding(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -141,29 +175,43 @@ class _CatalogPageState extends State<CatalogPage> {
                   ),
                 )
               else if (_grid)
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 120),
-                  sliver: SliverGrid(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        final item = filtered[index];
-                        return ItemTile(
-                          item: item,
-                          onTap: () => _showQuickLook(context, item),
-                          onLongPress: () => widget.controller.toggleCompare(item),
-                          color: palette[index % palette.length],
-                          selected: widget.controller.compareList.contains(item),
-                        );
-                      },
-                      childCount: filtered.length,
-                    ),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
-                      childAspectRatio: 0.78,
-                    ),
-                  ),
+                SliverLayoutBuilder(
+                  builder: (context, constraints) {
+                    var crossAxisCount = (constraints.crossAxisExtent / 260).floor();
+                    if (crossAxisCount < 2) {
+                      crossAxisCount = 2;
+                    }
+                    if (crossAxisCount > 4) {
+                      crossAxisCount = 4;
+                    }
+                    final imageHeight = crossAxisCount >= 3 ? 150.0 : 200.0;
+                    final aspectRatio = crossAxisCount >= 3 ? 0.9 : 0.72;
+                    return SliverPadding(
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 120),
+                      sliver: SliverGrid(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            final item = filtered[index];
+                            return ItemTile(
+                              item: item,
+                              onTap: () => _showQuickLook(context, item),
+                              onLongPress: () => widget.controller.toggleCompare(item),
+                              color: palette[index % palette.length],
+                              selected: widget.controller.compareList.contains(item),
+                              imageHeight: imageHeight,
+                            );
+                          },
+                          childCount: filtered.length,
+                        ),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: crossAxisCount,
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
+                          childAspectRatio: aspectRatio,
+                        ),
+                      ),
+                    );
+                  },
                 )
               else
                 SliverPadding(
@@ -180,6 +228,7 @@ class _CatalogPageState extends State<CatalogPage> {
                             onLongPress: () => widget.controller.toggleCompare(item),
                             color: palette[index % palette.length],
                             selected: widget.controller.compareList.contains(item),
+                            imageHeight: 220,
                           ),
                         );
                       },
@@ -211,6 +260,8 @@ class _CatalogPageState extends State<CatalogPage> {
             color: Theme.of(context).colorScheme.primary.withOpacity(0.12),
             selected: false,
             enableHero: false,
+            enableScroll: true,
+            imageHeight: 220,
           ),
         );
       },
@@ -314,6 +365,70 @@ class _CatalogPageState extends State<CatalogPage> {
     if (priceB == null) return -1;
     final comparison = priceA.compareTo(priceB);
     return descending ? -comparison : comparison;
+  }
+}
+
+class _SpotlightRail extends StatelessWidget {
+  const _SpotlightRail({
+    required this.title,
+    required this.subtitle,
+    required this.items,
+    required this.palette,
+    required this.controller,
+    required this.onOpenQuickLook,
+  });
+
+  final String title;
+  final String subtitle;
+  final List<Item> items;
+  final List<Color> palette;
+  final ItemsController controller;
+  final ValueChanged<Item> onOpenQuickLook;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          subtitle,
+          style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.textTheme.bodyMedium?.color?.withOpacity(0.7),
+              ),
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 300,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.only(right: 16),
+            itemBuilder: (context, index) {
+              final item = items[index];
+              return SizedBox(
+                width: 260,
+                child: ItemTile(
+                  item: item,
+                  onTap: () => onOpenQuickLook(item),
+                  onLongPress: () => controller.toggleCompare(item),
+                  color: palette[index % palette.length],
+                  selected: controller.compareList.contains(item),
+                  imageHeight: 170,
+                ),
+              );
+            },
+            separatorBuilder: (_, __) => const SizedBox(width: 16),
+            itemCount: items.length,
+          ),
+        ),
+      ],
+    );
   }
 }
 

@@ -10,11 +10,13 @@ import 'data/services/mock_event_service.dart';
 import 'data/services/mock_items_service.dart';
 import 'data/services/search_service.dart';
 import 'data/services/stats_service.dart';
+import 'data/services/on_this_day_service.dart';
 import 'domain/usecases/get_events_usecase.dart';
 import 'domain/usecases/get_items_usecase.dart';
 import 'domain/usecases/item_management_usecase.dart';
 import 'domain/usecases/refresh_events_usecase.dart';
 import 'domain/usecases/search_usecase.dart';
+import 'domain/usecases/get_on_this_day_usecase.dart';
 import 'presentation/controllers/auth_controller.dart';
 import 'presentation/controllers/bookmarks_controller.dart';
 import 'presentation/controllers/filters_controller.dart';
@@ -27,6 +29,7 @@ import 'presentation/controllers/settings_controller.dart';
 import 'presentation/controllers/sources_controller.dart';
 import 'presentation/controllers/topics_controller.dart';
 import 'presentation/controllers/trends_controller.dart';
+import 'presentation/controllers/on_this_day_controller.dart';
 import 'presentation/pages/auth/auth_page.dart';
 import 'presentation/pages/bookmarks/bookmarks_page.dart';
 import 'presentation/pages/home/root_shell.dart';
@@ -63,6 +66,9 @@ void main() async {
   final topicsController = TopicsController(prefs, eventsController);
   final sourcesController = SourcesController(prefs, eventsController);
   final trendsController = TrendsController(const StatsService());
+  final onThisDayService = MockOnThisDayService();
+  final onThisDayController = OnThisDayController(GetOnThisDayUseCase(onThisDayService));
+  await onThisDayController.load(force: true);
   eventsController.addListener(() {
     trendsController.update(eventsController.events);
   });
@@ -83,6 +89,7 @@ void main() async {
           parser: localParser,
           trendsController: trendsController,
           bookmarksController: bookmarksController,
+          onThisDayController: onThisDayController,
         ),
     AppPage.search: (context) => SearchPage(
           controller: searchController,
@@ -100,9 +107,10 @@ void main() async {
           searchController: searchController,
           filtersController: filtersController,
           parser: localParser,
-          startIndex: 2,
+          startIndex: 3,
           trendsController: trendsController,
           bookmarksController: bookmarksController,
+          onThisDayController: onThisDayController,
         ),
     AppPage.myItems: (context) => RootShell(
           routerState: routerState,
@@ -113,9 +121,24 @@ void main() async {
           searchController: searchController,
           filtersController: filtersController,
           parser: localParser,
-          startIndex: 3,
+          startIndex: 4,
           trendsController: trendsController,
           bookmarksController: bookmarksController,
+          onThisDayController: onThisDayController,
+        ),
+    AppPage.onThisDay: (context) => RootShell(
+          routerState: routerState,
+          eventsController: eventsController,
+          overlayController: overlayController,
+          itemsController: itemsController,
+          settingsController: settingsController,
+          searchController: searchController,
+          filtersController: filtersController,
+          parser: localParser,
+          startIndex: 2,
+          trendsController: trendsController,
+          bookmarksController: bookmarksController,
+          onThisDayController: onThisDayController,
         ),
     AppPage.ingest: (context) => IngestArticlePage(parser: localParser, eventsController: eventsController),
     AppPage.notifications: (context) => NotificationsPage(itemsController: itemsController),
