@@ -95,6 +95,7 @@ class AppLocalizations {
     'continue_guest': {'en': 'Continue as guest', 'ar': 'المتابعة كضيف'},
     'home': {'en': 'Home', 'ar': 'الرئيسية'},
     'briefing_nav': {'en': 'Briefing', 'ar': 'الموجز'},
+    'forecast_nav': {'en': 'Forecast', 'ar': 'التوقعات'},
     'briefing_title': {'en': 'Command Center', 'ar': 'مركز التحكم'},
     'briefing_intro': {
       'en': 'Review highlights, saved filters, and collection insights in one place.',
@@ -105,6 +106,7 @@ class AppLocalizations {
     'briefing_metric_lead_category': {'en': 'Lead category', 'ar': 'الفئة المتصدرة'},
     'briefing_metric_none': {'en': '—', 'ar': '—'},
     'briefing_quick_actions': {'en': 'Quick actions', 'ar': 'إجراءات سريعة'},
+    'briefing_action_forecast': {'en': 'Forecast lab', 'ar': 'مختبر التوقعات'},
     'briefing_action_search': {'en': 'Search feed', 'ar': 'بحث في الملخص'},
     'briefing_action_ingest': {'en': 'Parse article', 'ar': 'تحليل مقال'},
     'briefing_action_on_this_day': {'en': 'Historic moments', 'ar': 'أحداث اليوم التاريخية'},
@@ -137,6 +139,66 @@ class AppLocalizations {
     'briefing_top_tags': {'en': 'Top tags', 'ar': 'أبرز الوسوم'},
     'briefing_category_breakdown': {'en': 'Category breakdown', 'ar': 'توزيع الفئات'},
     'briefing_open_search': {'en': 'Open search', 'ar': 'فتح البحث'},
+    'forecast_lab_title': {'en': 'Forecast Lab', 'ar': 'مختبر التوقعات'},
+    'forecast_reset': {'en': 'Reset controls', 'ar': 'إعادة ضبط الإعدادات'},
+    'forecast_overview_title': {'en': 'Strategic outlook', 'ar': 'نظرة استراتيجية'},
+    'forecast_overview_momentum': {
+      'en': 'Momentum {value}%',
+      'ar': 'الزخم {value}%'
+    },
+    'forecast_overview_horizon': {
+      'en': 'Projected over a {days}-day horizon',
+      'ar': 'متوقعة خلال أفق {days} أيام'
+    },
+    'forecast_controls_title': {'en': 'Tuning controls', 'ar': 'ضبط الإعدادات'},
+    'forecast_optimism_label': {'en': 'Optimism', 'ar': 'التفاؤل'},
+    'forecast_volatility_label': {'en': 'Volatility', 'ar': 'التقلب'},
+    'forecast_horizon_label': {'en': 'Horizon (days)', 'ar': 'أفق التوقع (أيام)'},
+    'forecast_focus_label': {'en': 'Focus category', 'ar': 'الفئة المركزة'},
+    'forecast_projections_title': {'en': 'Category projections', 'ar': 'توقعات الفئات'},
+    'forecast_projection_expected': {
+      'en': '~{value} stories expected',
+      'ar': 'حوالي {value} قصة متوقعة'
+    },
+    'forecast_projection_change_positive': {
+      'en': 'Up {value}%',
+      'ar': 'ارتفاع {value}%'
+    },
+    'forecast_projection_change_negative': {
+      'en': 'Down {value}%',
+      'ar': 'انخفاض {value}%'
+    },
+    'forecast_projection_change_neutral': {
+      'en': 'Stable outlook',
+      'ar': 'توقع مستقر'
+    },
+    'forecast_recommended_tags': {'en': 'Tags to prioritize', 'ar': 'وسوم يجب التركيز عليها'},
+    'forecast_focus_events': {'en': 'Focus watchlist', 'ar': 'قائمة متابعة التركيز'},
+    'forecast_focus_empty': {
+      'en': 'No recent stories for this focus yet.',
+      'ar': 'لا توجد قصص حديثة لهذا التركيز بعد.'
+    },
+    'forecast_suggestions_title': {'en': 'Strategist notes', 'ar': 'ملاحظات استراتيجية'},
+    'forecast_empty_state': {
+      'en': 'Tune the controls once new stories arrive to generate projections.',
+      'ar': 'قم بضبط الإعدادات عند توفر قصص جديدة لإنشاء التوقعات.'
+    },
+    'forecast_suggestion_expand': {
+      'en': 'Increase coverage on {category} while momentum is rising.',
+      'ar': 'زد التغطية لفئة {category} مع ارتفاع الزخم.'
+    },
+    'forecast_suggestion_monitor': {
+      'en': 'Monitor {category} closely; signals are cooling.',
+      'ar': 'راقب فئة {category} عن كثب؛ المؤشرات تنخفض.'
+    },
+    'forecast_suggestion_capitalize': {
+      'en': 'Overall sentiment is strong—capitalize on the momentum.',
+      'ar': 'المعنويات العامة قوية — استفد من الزخم.'
+    },
+    'forecast_suggestion_rebalance': {
+      'en': 'Momentum is softening; rebalance your focus mix.',
+      'ar': 'الزخم يضعف؛ أعد توازن مزيج التركيز.'
+    },
     'search': {'en': 'Search', 'ar': 'بحث'},
     'on_this_day': {'en': 'On This Day', 'ar': 'في مثل هذا اليوم'},
     'on_this_day_nav': {'en': 'On This Day', 'ar': 'حدث اليوم'},

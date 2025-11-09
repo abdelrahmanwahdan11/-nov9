@@ -11,6 +11,7 @@ import 'data/services/mock_items_service.dart';
 import 'data/services/search_service.dart';
 import 'data/services/stats_service.dart';
 import 'data/services/on_this_day_service.dart';
+import 'data/services/forecast_service.dart';
 import 'domain/usecases/get_events_usecase.dart';
 import 'domain/usecases/get_items_usecase.dart';
 import 'domain/usecases/item_management_usecase.dart';
@@ -22,6 +23,7 @@ import 'presentation/controllers/bookmarks_controller.dart';
 import 'presentation/controllers/filters_controller.dart';
 import 'presentation/controllers/events_controller.dart';
 import 'presentation/controllers/history_controller.dart';
+import 'presentation/controllers/forecast_controller.dart';
 import 'presentation/controllers/items_controller.dart';
 import 'presentation/controllers/overlay_controller.dart';
 import 'presentation/controllers/search_controller.dart';
@@ -70,6 +72,7 @@ void main() async {
   final trendsController = TrendsController(const StatsService());
   final onThisDayService = MockOnThisDayService();
   final onThisDayController = OnThisDayController(GetOnThisDayUseCase(onThisDayService));
+  final forecastController = ForecastController(const ForecastService(), eventsController);
   await onThisDayController.load(force: true);
   eventsController.addListener(() {
     trendsController.update(eventsController.events);
@@ -93,6 +96,7 @@ void main() async {
           trendsController: trendsController,
           bookmarksController: bookmarksController,
           onThisDayController: onThisDayController,
+          forecastController: forecastController,
         ),
     AppPage.briefing: (context) => RootShell(
           routerState: routerState,
@@ -106,7 +110,23 @@ void main() async {
           trendsController: trendsController,
           bookmarksController: bookmarksController,
           onThisDayController: onThisDayController,
+          forecastController: forecastController,
           startIndex: 1,
+        ),
+    AppPage.forecast: (context) => RootShell(
+          routerState: routerState,
+          eventsController: eventsController,
+          overlayController: overlayController,
+          itemsController: itemsController,
+          settingsController: settingsController,
+          searchController: searchController,
+          filtersController: filtersController,
+          parser: localParser,
+          trendsController: trendsController,
+          bookmarksController: bookmarksController,
+          onThisDayController: onThisDayController,
+          forecastController: forecastController,
+          startIndex: 2,
         ),
     AppPage.search: (context) => SearchPage(
           controller: searchController,
@@ -124,10 +144,11 @@ void main() async {
           searchController: searchController,
           filtersController: filtersController,
           parser: localParser,
-          startIndex: 4,
+          startIndex: 5,
           trendsController: trendsController,
           bookmarksController: bookmarksController,
           onThisDayController: onThisDayController,
+          forecastController: forecastController,
         ),
     AppPage.inventory: (context) => RootShell(
           routerState: routerState,
@@ -138,10 +159,11 @@ void main() async {
           searchController: searchController,
           filtersController: filtersController,
           parser: localParser,
-          startIndex: 5,
+          startIndex: 6,
           trendsController: trendsController,
           bookmarksController: bookmarksController,
           onThisDayController: onThisDayController,
+          forecastController: forecastController,
         ),
     AppPage.onThisDay: (context) => RootShell(
           routerState: routerState,
@@ -152,10 +174,11 @@ void main() async {
           searchController: searchController,
           filtersController: filtersController,
           parser: localParser,
-          startIndex: 3,
+          startIndex: 4,
           trendsController: trendsController,
           bookmarksController: bookmarksController,
           onThisDayController: onThisDayController,
+          forecastController: forecastController,
         ),
     AppPage.ingest: (context) => IngestArticlePage(parser: localParser, eventsController: eventsController),
     AppPage.notifications: (context) => NotificationsPage(itemsController: itemsController),

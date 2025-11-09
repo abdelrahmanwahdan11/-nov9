@@ -28,6 +28,7 @@ class BriefingPage extends StatelessWidget {
     required this.filtersController,
     required this.searchController,
     required this.onSelectTab,
+    required this.onOpenForecast,
   });
 
   final AppRouterState routerState;
@@ -39,6 +40,7 @@ class BriefingPage extends StatelessWidget {
   final FiltersController filtersController;
   final SearchPageController searchController;
   final ValueChanged<int> onSelectTab;
+  final VoidCallback onOpenForecast;
 
   @override
   Widget build(BuildContext context) {
@@ -95,12 +97,13 @@ class BriefingPage extends StatelessWidget {
               const SizedBox(height: 24),
               _QuickActions(
                 l10n: l10n,
-                onShowSearch: () => onSelectTab(2),
+                onShowSearch: () => onSelectTab(3),
                 onOpenIngest: () => routerState.push(AppPage.ingest),
-                onShowTimeline: () => onSelectTab(3),
-                onShowInventory: () => onSelectTab(5),
+                onShowTimeline: () => onSelectTab(4),
+                onShowInventory: () => onSelectTab(6),
                 onOpenTrends: () => routerState.push(AppPage.trends),
                 onOpenShare: () => routerState.push(AppPage.sharePoster),
+                onOpenForecast: onOpenForecast,
               ),
               if (categoryStats.isNotEmpty) ...[
                 const SizedBox(height: 24),
@@ -114,7 +117,7 @@ class BriefingPage extends StatelessWidget {
               _SavedFiltersCard(
                 l10n: l10n,
                 filters: savedFilters,
-                onManage: () => onSelectTab(2),
+                onManage: () => onSelectTab(3),
                 onApply: (filter) => _applyFilter(context, filter, l10n),
               ),
               const SizedBox(height: 24),
@@ -127,13 +130,13 @@ class BriefingPage extends StatelessWidget {
               _ItemsPreview(
                 items: trackedItems,
                 l10n: l10n,
-                onOpenInventory: () => onSelectTab(5),
+                onOpenInventory: () => onSelectTab(6),
               ),
               const SizedBox(height: 24),
               _HistoricalPreview(
                 events: timelinePreview,
                 l10n: l10n,
-                onOpenTimeline: () => onSelectTab(3),
+                onOpenTimeline: () => onSelectTab(4),
               ),
             ],
           ),
@@ -151,7 +154,7 @@ class BriefingPage extends StatelessWidget {
         ),
       ),
     );
-    onSelectTab(2);
+    onSelectTab(3);
   }
 }
 
@@ -266,6 +269,7 @@ class _QuickActions extends StatelessWidget {
     required this.onShowInventory,
     required this.onOpenTrends,
     required this.onOpenShare,
+    required this.onOpenForecast,
   });
 
   final AppLocalizations l10n;
@@ -275,10 +279,12 @@ class _QuickActions extends StatelessWidget {
   final VoidCallback onShowInventory;
   final VoidCallback onOpenTrends;
   final VoidCallback onOpenShare;
+  final VoidCallback onOpenForecast;
 
   @override
   Widget build(BuildContext context) {
     final actions = [
+      _QuickAction(IconlyLight.chart, l10n.translate('briefing_action_forecast'), onOpenForecast),
       _QuickAction(IconlyLight.search, l10n.translate('briefing_action_search'), onShowSearch),
       _QuickAction(IconlyLight.edit, l10n.translate('briefing_action_ingest'), onOpenIngest),
       _QuickAction(IconlyLight.calendar, l10n.translate('briefing_action_on_this_day'), onShowTimeline),
