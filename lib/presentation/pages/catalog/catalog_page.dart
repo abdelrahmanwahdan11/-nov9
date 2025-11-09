@@ -14,9 +14,16 @@ import '../../widgets/item_composer_sheet.dart';
 enum _CatalogSort { name, condition, priceLowHigh, priceHighLow }
 
 class CatalogPage extends StatefulWidget {
-  const CatalogPage({super.key, required this.controller});
+  const CatalogPage({
+    super.key,
+    required this.controller,
+    this.embedded = false,
+    this.showFab = true,
+  });
 
   final ItemsController controller;
+  final bool embedded;
+  final bool showFab;
 
   @override
   State<CatalogPage> createState() => _CatalogPageState();
@@ -50,7 +57,7 @@ class _CatalogPageState extends State<CatalogPage> {
       DesignTokens.colors['lime']!,
     ];
 
-    return AnimatedBuilder(
+    final content = AnimatedBuilder(
       animation: widget.controller,
       builder: (context, _) {
         final items = widget.controller.items;
@@ -72,28 +79,7 @@ class _CatalogPageState extends State<CatalogPage> {
         }
         final reversedPalette = palette.reversed.toList();
 
-        return Scaffold(
-          appBar: AppBar(
-            title: Text(l10n.translate('catalog')),
-            actions: [
-              IconButton(
-                tooltip: l10n.translate(_grid ? 'catalog_view_list' : 'catalog_view_grid'),
-                icon: Icon(_grid ? IconlyLight.paper : IconlyLight.category),
-                onPressed: () => setState(() => _grid = !_grid),
-              ),
-            ],
-          ),
-          floatingActionButton: FloatingActionButton.extended(
-            onPressed: () async {
-              final item = await showItemComposerSheet(context);
-              if (item != null) {
-                await widget.controller.addItem(item);
-              }
-            },
-            icon: const Icon(IconlyLight.plus),
-            label: Text(l10n.translate('add_item')),
-          ),
-          body: CustomScrollView(
+        final body = CustomScrollView(
             slivers: [
               SliverToBoxAdapter(
                 child: Padding(
@@ -118,6 +104,8 @@ class _CatalogPageState extends State<CatalogPage> {
                     allItems: items,
                     filteredItems: filtered,
                     targetHighlights: targetHighlights,
+                    showLayoutToggle: widget.embedded,
+                    onToggleLayout: () => setState(() => _grid = !_grid),
                   ),
                 ),
               ),
@@ -239,8 +227,62 @@ class _CatalogPageState extends State<CatalogPage> {
             ],
           ),
         );
+
+        if (widget.embedded) {
+          return body;
+        }
+
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(l10n.translate('catalog')),
+            actions: [
+              IconButton(
+                tooltip: l10n.translate(_grid ? 'catalog_view_list' : 'catalog_view_grid'),
+                icon: Icon(_grid ? IconlyLight.paper : IconlyLight.category),
+                onPressed: () => setState(() => _grid = !_grid),
+              ),
+            ],
+          ),
+          floatingActionButton: widget.showFab
+              ? FloatingActionButton.extended(
+                  onPressed: () async {
+                    final item = await showItemComposerSheet(context);
+                    if (item != null) {
+                      await widget.controller.addItem(item);
+                    }
+                  },
+                  icon: const Icon(IconlyLight.plus),
+                  label: Text(l10n.translate('add_item')),
+                )
+              : null,
+          body: body,
+        );
       },
     );
+
+    if (widget.embedded && widget.showFab) {
+      return Stack(
+        children: [
+          content,
+          Positioned(
+            right: 24,
+            bottom: 24,
+            child: FloatingActionButton.extended(
+              onPressed: () async {
+                final item = await showItemComposerSheet(context);
+                if (item != null) {
+                  await widget.controller.addItem(item);
+                }
+              },
+              icon: const Icon(IconlyLight.plus),
+              label: Text(AppLocalizations.of(context).translate('add_item')),
+            ),
+          ),
+        ],
+      );
+    }
+
+    return content;
   }
 
   void _showQuickLook(BuildContext context, Item item) {
@@ -453,6 +495,8 @@ class _Header extends StatelessWidget {
     required this.allItems,
     required this.filteredItems,
     required this.targetHighlights,
+    required this.showLayoutToggle,
+    required this.onToggleLayout,
   });
 
   final ItemsController controller;
@@ -474,6 +518,8 @@ class _Header extends StatelessWidget {
   final List<Item> allItems;
   final List<Item> filteredItems;
   final List<Item> targetHighlights;
+  final bool showLayoutToggle;
+  final VoidCallback onToggleLayout;
 
   @override
   Widget build(BuildContext context) {
@@ -482,22 +528,42 @@ class _Header extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        TextField(
-          controller: searchController,
-          onChanged: onQueryChanged,
-          decoration: InputDecoration(
-            hintText: l10n.translate('catalog_search_hint'),
-            prefixIcon: const Icon(IconlyLight.search),
-            suffixIcon: query.isEmpty
-                ? null
-                : IconButton(
-                    icon: const Icon(Icons.clear),
-                    onPressed: () {
-                      searchController.clear();
-                      onQueryChanged('');
-                    },
+        Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: searchController,
+                onChanged: onQueryChanged,
+                decoration: InputDecoration(
+                  hintText: l10n.translate('catalog_search_hint'),
+                  prefixIcon: const Icon(IconlyLight.search),
+                  suffixIcon: query.isEmpty
+                      ? null
+                      : IconButton(
+                          icon: const Icon(Icons.clear),
+                          onPressed: () {
+                            searchController.clear();
+                            onQueryChanged('');
+                          },
+                        ),
+                ),
+              ),
+            ),
+            if (showLayoutToggle) ...[
+              const SizedBox(width: 12),
+              Tooltip(
+                message: l10n.translate(gridView ? 'catalog_view_list' : 'catalog_view_grid'),
+                child: FilledButton.tonal(
+                  onPressed: onToggleLayout,
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size(48, 48),
+                    shape: const CircleBorder(),
                   ),
-          ),
+                  child: Icon(gridView ? IconlyLight.paper : IconlyLight.category),
+                ),
+              ),
+            ],
+          ],
         ),
         const SizedBox(height: 16),
         Wrap(

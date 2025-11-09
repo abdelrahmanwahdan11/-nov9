@@ -232,6 +232,53 @@ class MockOnThisDayService {
       source: 'Heritage Watch',
       tags: ['heritage', 'archaeology', 'tourism'],
     ),
+    ...List.generate(50, (index) {
+      const countries = [
+        'Morocco',
+        'Brazil',
+        'India',
+        'Canada',
+        'Australia',
+        'Kenya',
+        'Italy',
+        'Mexico',
+        'Indonesia',
+        'Sweden',
+      ];
+      const imagePool = [
+        'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee',
+        'https://images.unsplash.com/photo-1469474968028-56623f02e42e',
+        'https://images.unsplash.com/photo-1496307042754-b4aa456c4a2d',
+        'https://images.unsplash.com/photo-1520607162513-77705c0f0d4a',
+        'https://images.unsplash.com/photo-1529429617124-aee711a83b51',
+      ];
+      final type = HistoricalEventType.values[index % HistoricalEventType.values.length];
+      final country = countries[index % countries.length];
+      final year = 1960 + index;
+      final month = (index % 12) + 1;
+      final day = ((index * 2) % 28) + 1;
+      final imageUrl = imagePool[index % imagePool.length];
+      final ordinal = index + 1;
+      return _HistoricalEventSeed(
+        id: 'hist-generated-$ordinal',
+        title: 'Spotlight story $ordinal',
+        description:
+            'Communities across $country collaborated on milestone number $ordinal, marking a ${type.name.replaceAll('_', ' ')} achievement remembered on this day.',
+        country: country,
+        type: type,
+        year: year,
+        month: month,
+        day: day,
+        imageUrl: imageUrl,
+        highlights: [
+          'Regional leaders held open forums',
+          'Youth initiatives showcased future plans',
+          'Local media chronicled community voices',
+        ],
+        source: 'Global Spotlight Archive',
+        tags: ['spotlight', country.toLowerCase(), type.name],
+      );
+    }),
   ];
 
   List<HistoricalEvent> getEventsFor(

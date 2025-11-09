@@ -13,11 +13,11 @@ import '../../controllers/overlay_controller.dart';
 import '../../controllers/search_controller.dart';
 import '../../controllers/settings_controller.dart';
 import '../../controllers/trends_controller.dart';
-import '../catalog/catalog_page.dart';
-import '../my_items/my_items_page.dart';
+import '../inventory/inventory_page.dart';
 import '../search/search_page.dart';
 import '../settings/settings_page.dart';
 import '../on_this_day/on_this_day_page.dart';
+import '../on_this_day/global_spotlight_page.dart';
 import 'home_page.dart';
 
 class RootShell extends StatefulWidget {
@@ -96,8 +96,8 @@ class _RootShellState extends State<RootShell> {
             bookmarksController: widget.bookmarksController,
           ),
           OnThisDayPage(controller: widget.onThisDayController),
-          CatalogPage(controller: widget.itemsController),
-          MyItemsPage(controller: widget.itemsController),
+          GlobalSpotlightPage(controller: widget.onThisDayController),
+          InventoryPage(controller: widget.itemsController),
           SettingsPage(
             controller: widget.settingsController,
             onOpenNotifications: () => widget.routerState.push(AppPage.notifications),
@@ -122,8 +122,8 @@ class _RootShellState extends State<RootShell> {
               NavigationDestination(icon: const Icon(IconlyLight.home), label: l10n.translate('home')),
               NavigationDestination(icon: const Icon(IconlyLight.search), label: l10n.translate('search')),
               NavigationDestination(icon: const Icon(IconlyLight.calendar), label: l10n.translate('on_this_day_nav')),
-              NavigationDestination(icon: const Icon(IconlyLight.category), label: l10n.translate('catalog')),
-              NavigationDestination(icon: const Icon(IconlyLight.bag), label: l10n.translate('my_items')),
+              NavigationDestination(icon: const Icon(IconlyLight.discovery), label: l10n.translate('global_spotlight_nav')),
+              NavigationDestination(icon: const Icon(IconlyLight.category), label: l10n.translate('inventory_nav')),
               NavigationDestination(icon: const Icon(IconlyLight.setting), label: l10n.translate('settings')),
             ],
           ),

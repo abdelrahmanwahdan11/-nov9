@@ -14,6 +14,7 @@ class PrefsKeys {
   static const bookmarks = 'bookmarks';
   static const savedFilters = 'saved_filters';
   static const seenTips = 'seen_tips';
+  static const completedOnboarding = 'completed_onboarding';
 }
 
 class PrefsService {
@@ -113,6 +114,13 @@ class PrefsService {
     await _prefs.setStringList(PrefsKeys.seenTips, tips);
   }
 
+  bool get hasCompletedOnboarding =>
+      _prefs.getBool(PrefsKeys.completedOnboarding) ?? false;
+
+  Future<void> setCompletedOnboarding([bool value = true]) async {
+    await _prefs.setBool(PrefsKeys.completedOnboarding, value);
+  }
+
   Future<void> clearMockData() async {
     await _prefs.remove(PrefsKeys.items);
   }
@@ -140,6 +148,7 @@ class PrefsService {
       PrefsKeys.bookmarks: _prefs.getStringList(PrefsKeys.bookmarks),
       PrefsKeys.savedFilters: _prefs.getString(PrefsKeys.savedFilters),
       PrefsKeys.seenTips: _prefs.getStringList(PrefsKeys.seenTips),
+      PrefsKeys.completedOnboarding: _prefs.getBool(PrefsKeys.completedOnboarding),
     };
     return jsonEncode(backup);
   }

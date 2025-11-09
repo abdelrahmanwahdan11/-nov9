@@ -4,12 +4,14 @@ import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/i18n/app_localizations.dart';
+import '../../../core/preferences/prefs_service.dart';
 import '../../../core/router/app_router.dart';
 
 class OnboardingPage extends StatefulWidget {
-  const OnboardingPage({super.key, required this.routerState});
+  const OnboardingPage({super.key, required this.routerState, required this.prefs});
 
   final AppRouterState routerState;
+  final PrefsService prefs;
 
   @override
   State<OnboardingPage> createState() => _OnboardingPageState();
@@ -78,7 +80,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
               top: 16,
               right: 16,
               child: TextButton(
-                onPressed: () => widget.routerState.replace(AppPage.auth),
+                onPressed: () async {
+                  await _completeOnboarding();
+                },
                 child: Text(l10n.translate('skip')),
               ),
             ),
@@ -107,9 +111,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   ),
                   const Spacer(),
                   FilledButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (_index == _slides.length - 1) {
-                        widget.routerState.replace(AppPage.auth);
+                        await _completeOnboarding();
                       } else {
                         _index++;
                         _controller.animateToPage(
@@ -128,6 +132,11 @@ class _OnboardingPageState extends State<OnboardingPage> {
         ),
       ),
     );
+  }
+
+  Future<void> _completeOnboarding() async {
+    await widget.prefs.setCompletedOnboarding();
+    widget.routerState.replace(AppPage.auth);
   }
 }
 
@@ -153,22 +162,36 @@ class _OnboardingSlideView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
+                flex: 5,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(32),
                   child: Image.network(slide.image, fit: BoxFit.cover, width: double.infinity),
                 ),
               ),
-              const SizedBox(height: 32),
-              Text(
-                slide.title,
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
+              const SizedBox(height: 28),
+              Expanded(
+                flex: 3,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      slide.title,
+                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
+                    ),
+                    const SizedBox(height: 12),
+                    Expanded(
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Text(
+                          slide.subtitle,
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 12),
-              Text(
-                slide.subtitle,
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
-              const SizedBox(height: 56),
+              const SizedBox(height: 8),
             ],
           ),
         );

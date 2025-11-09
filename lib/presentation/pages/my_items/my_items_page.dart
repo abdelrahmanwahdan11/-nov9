@@ -9,9 +9,16 @@ import '../../widgets/item_tile.dart';
 import '../../widgets/item_composer_sheet.dart';
 
 class MyItemsPage extends StatefulWidget {
-  const MyItemsPage({super.key, required this.controller});
+  const MyItemsPage({
+    super.key,
+    required this.controller,
+    this.embedded = false,
+    this.showFab = true,
+  });
 
   final ItemsController controller;
+  final bool embedded;
+  final bool showFab;
 
   @override
   State<MyItemsPage> createState() => _MyItemsPageState();
@@ -21,7 +28,18 @@ class _MyItemsPageState extends State<MyItemsPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return DefaultTabController(
+    Widget buildFab() => FloatingActionButton.extended(
+          onPressed: () async {
+            final item = await showItemComposerSheet(context);
+            if (item != null) {
+              await widget.controller.addItem(item);
+            }
+          },
+          icon: const Icon(IconlyLight.plus),
+          label: Text(l10n.translate('add_item')),
+        );
+
+    Widget content = DefaultTabController(
       length: 2,
       child: AnimatedBuilder(
         animation: widget.controller,
@@ -31,6 +49,89 @@ class _MyItemsPageState extends State<MyItemsPage> {
           final listed = items.where((item) => item.forSale).toList();
           final latestOffer = widget.controller.latestOffer;
           final recent = items.reversed.take(6).toList();
+
+          final tabViews = TabBarView(
+            children: [
+              _ItemsTab(
+                controller: widget.controller,
+                items: kept,
+                l10n: l10n,
+                header: _TabHeaderData(
+                  title: l10n.translate('my_items_kept_title'),
+                  subtitle: l10n.translateWithArgs('my_items_kept_count', {'count': kept.length.toString()}),
+                  icon: IconlyLight.heart,
+                ),
+                recent: recent,
+                latestOffer: latestOffer,
+                showOfferBanner: false,
+              ),
+              _ItemsTab(
+                controller: widget.controller,
+                items: listed,
+                l10n: l10n,
+                header: _TabHeaderData(
+                  title: l10n.translate('my_items_listed_title'),
+                  subtitle: l10n.translateWithArgs('my_items_listed_count', {'count': listed.length.toString()}),
+                  icon: IconlyLight.ticket_star,
+                ),
+                recent: recent,
+                latestOffer: latestOffer,
+                showOfferBanner: true,
+              ),
+            ],
+          );
+
+          if (widget.embedded) {
+            final column = Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.translate('inventory_tab_collection'),
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        l10n.translateWithArgs('my_items_overview_total', {'count': items.length.toString()}),
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyMedium
+                            ?.copyWith(color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7)),
+                      ),
+                    ],
+                  ),
+                ),
+                Material(
+                  color: Colors.transparent,
+                  child: TabBar(
+                    tabs: [
+                      Tab(text: l10n.translate('my_items_tab_kept')),
+                      Tab(text: l10n.translate('my_items_tab_listed')),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Expanded(child: tabViews),
+              ],
+            );
+            if (!widget.showFab) {
+              return column;
+            }
+            return Stack(
+              children: [
+                Positioned.fill(child: column),
+                Positioned(
+                  right: 24,
+                  bottom: 24,
+                  child: buildFab(),
+                ),
+              ],
+            );
+          }
 
           return Scaffold(
             appBar: AppBar(
@@ -42,50 +143,14 @@ class _MyItemsPageState extends State<MyItemsPage> {
                 ],
               ),
             ),
-            floatingActionButton: FloatingActionButton.extended(
-              onPressed: () async {
-                final item = await showItemComposerSheet(context);
-                if (item != null) {
-                  await widget.controller.addItem(item);
-                }
-              },
-              icon: const Icon(IconlyLight.plus),
-              label: Text(l10n.translate('add_item')),
-            ),
-            body: TabBarView(
-              children: [
-                _ItemsTab(
-                  controller: widget.controller,
-                  items: kept,
-                  l10n: l10n,
-                  header: _TabHeaderData(
-                    title: l10n.translate('my_items_kept_title'),
-                    subtitle: l10n.translateWithArgs('my_items_kept_count', {'count': kept.length.toString()}),
-                    icon: IconlyLight.heart,
-                  ),
-                  recent: recent,
-                  latestOffer: latestOffer,
-                  showOfferBanner: false,
-                ),
-                _ItemsTab(
-                  controller: widget.controller,
-                  items: listed,
-                  l10n: l10n,
-                  header: _TabHeaderData(
-                    title: l10n.translate('my_items_listed_title'),
-                    subtitle: l10n.translateWithArgs('my_items_listed_count', {'count': listed.length.toString()}),
-                    icon: IconlyLight.ticket_star,
-                  ),
-                  recent: recent,
-                  latestOffer: latestOffer,
-                  showOfferBanner: true,
-                ),
-              ],
-            ),
+            floatingActionButton: widget.showFab ? buildFab() : null,
+            body: tabViews,
           );
         },
       ),
     );
+
+    return content;
   }
 }
 

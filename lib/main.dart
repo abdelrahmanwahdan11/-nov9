@@ -38,6 +38,8 @@ import 'presentation/pages/notifications/notifications_page.dart';
 import 'presentation/pages/onboarding/onboarding_page.dart';
 import 'presentation/pages/history/history_page.dart';
 import 'presentation/pages/help/help_page.dart';
+import 'presentation/pages/inventory/inventory_page.dart';
+import 'presentation/pages/on_this_day/global_spotlight_page.dart';
 import 'presentation/pages/search/search_page.dart';
 import 'presentation/pages/share/share_poster_page.dart';
 import 'presentation/pages/settings/settings_page.dart';
@@ -74,9 +76,10 @@ void main() async {
   });
   trendsController.update(eventsController.events);
 
-  final routerState = AppRouterState();
+  final initialPage = prefs.hasCompletedOnboarding ? AppPage.home : AppPage.onboarding;
+  final routerState = AppRouterState(initialPage: initialPage);
   final routerDelegate = AppRouterDelegate(routerState, {
-    AppPage.onboarding: (context) => OnboardingPage(routerState: routerState),
+    AppPage.onboarding: (context) => OnboardingPage(routerState: routerState, prefs: prefs),
     AppPage.auth: (context) => AuthPage(routerState: routerState, controller: authController),
     AppPage.home: (context) => RootShell(
           routerState: routerState,
@@ -98,7 +101,7 @@ void main() async {
           items: itemsController.items,
           bookmarksController: bookmarksController,
         ),
-    AppPage.catalog: (context) => RootShell(
+    AppPage.spotlight: (context) => RootShell(
           routerState: routerState,
           eventsController: eventsController,
           overlayController: overlayController,
@@ -112,7 +115,7 @@ void main() async {
           bookmarksController: bookmarksController,
           onThisDayController: onThisDayController,
         ),
-    AppPage.myItems: (context) => RootShell(
+    AppPage.inventory: (context) => RootShell(
           routerState: routerState,
           eventsController: eventsController,
           overlayController: overlayController,

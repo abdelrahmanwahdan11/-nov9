@@ -63,7 +63,8 @@ class _Parallax3DImageState extends State<Parallax3DImage> {
       ),
     );
 
-    if (widget.enableHero) {
+    final heroEnabled = widget.enableHero && ((ModalRoute.of(context)?.isCurrent) ?? true);
+    if (heroEnabled) {
       image = Hero(tag: widget.heroTag, child: image);
     }
 

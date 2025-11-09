@@ -3,6 +3,7 @@ import 'package:iconly/iconly.dart';
 
 import '../../../core/constants/design_tokens.dart';
 import '../../../core/i18n/app_localizations.dart';
+import '../../../data/models/historical_event.dart';
 import '../../controllers/on_this_day_controller.dart';
 import '../../widgets/on_this_day_card.dart';
 
@@ -38,6 +39,7 @@ class _OnThisDayPageState extends State<OnThisDayPage> {
       animation: widget.controller,
       builder: (context, _) {
         final events = widget.controller.events;
+        final typeBreakdown = _typeBreakdown(events);
         return Scaffold(
           appBar: AppBar(
             title: Text(l10n.translate('on_this_day')),
@@ -59,18 +61,25 @@ class _OnThisDayPageState extends State<OnThisDayPage> {
             child: CustomScrollView(
               physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
               slivers: [
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-                    child: _Filters(
-                      controller: widget.controller,
-                      l10n: l10n,
-                    ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                  child: _Filters(
+                    controller: widget.controller,
+                    l10n: l10n,
                   ),
                 ),
-                if (widget.controller.isLoading && events.isEmpty)
-                  const SliverFillRemaining(
-                    hasScrollBody: false,
+              ),
+              if (typeBreakdown.isNotEmpty)
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+                    child: _TypePulse(breakdown: typeBreakdown, l10n: l10n),
+                  ),
+                ),
+              if (widget.controller.isLoading && events.isEmpty)
+                const SliverFillRemaining(
+                  hasScrollBody: false,
                     child: Center(child: CircularProgressIndicator()),
                   )
                 else if (events.isEmpty)
@@ -116,6 +125,59 @@ class _OnThisDayPageState extends State<OnThisDayPage> {
     if (selected != null) {
       await widget.controller.setDate(selected);
     }
+  }
+}
+
+Map<HistoricalEventType, int> _typeBreakdown(List<HistoricalEvent> events) {
+  final counts = <HistoricalEventType, int>{};
+  for (final event in events) {
+    counts.update(event.type, (value) => value + 1, ifAbsent: () => 1);
+  }
+  return counts;
+}
+
+class _TypePulse extends StatelessWidget {
+  const _TypePulse({required this.breakdown, required this.l10n});
+
+  final Map<HistoricalEventType, int> breakdown;
+  final AppLocalizations l10n;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final total = breakdown.values.fold<int>(0, (previous, element) => previous + element);
+    return Card(
+      elevation: 0,
+      color: theme.colorScheme.primary.withOpacity(0.08),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.translate('global_spotlight_types'), style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: breakdown.entries
+                  .map(
+                    (entry) => Chip(
+                      label: Text('${l10n.translate(entry.key.localizationKey())} · ${entry.value}'),
+                    ),
+                  )
+                  .toList(),
+            ),
+            const SizedBox(height: 12),
+            LinearProgressIndicator(
+              value: total == 0 ? 0 : breakdown.values.reduce((a, b) => a > b ? a : b) / total,
+              backgroundColor: theme.colorScheme.onPrimary.withOpacity(0.1),
+              color: theme.colorScheme.primary,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

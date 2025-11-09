@@ -7,8 +7,8 @@ enum AppPage {
   home,
   search,
   onThisDay,
-  catalog,
-  myItems,
+  spotlight,
+  inventory,
   ingest,
   notifications,
   settings,
@@ -22,8 +22,8 @@ enum AppPage {
 }
 
 class AppRouterState extends ChangeNotifier {
-  AppRouterState() {
-    _pages = [AppPage.onboarding];
+  AppRouterState({AppPage initialPage = AppPage.onboarding}) {
+    _pages = [initialPage];
   }
 
   late List<AppPage> _pages;
