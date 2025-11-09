@@ -10,6 +10,7 @@ class Parallax3DImage extends StatefulWidget {
     this.borderRadius = 24,
     this.onTap,
     this.height,
+    this.enableHero = true,
   });
 
   final String imageUrl;
@@ -17,6 +18,7 @@ class Parallax3DImage extends StatefulWidget {
   final double borderRadius;
   final VoidCallback? onTap;
   final double? height;
+  final bool enableHero;
 
   @override
   State<Parallax3DImage> createState() => _Parallax3DImageState();
@@ -45,6 +47,26 @@ class _Parallax3DImageState extends State<Parallax3DImage> {
 
   @override
   Widget build(BuildContext context) {
+    Widget image = ClipRRect(
+      borderRadius: BorderRadius.circular(widget.borderRadius),
+      child: Image.network(
+        widget.imageUrl,
+        fit: BoxFit.cover,
+        height: widget.height ?? 180,
+        width: double.infinity,
+        loadingBuilder: (context, child, progress) {
+          if (progress == null) return child;
+          return Container(
+            color: Colors.black12,
+          );
+        },
+      ),
+    );
+
+    if (widget.enableHero) {
+      image = Hero(tag: widget.heroTag, child: image);
+    }
+
     return GestureDetector(
       onTap: widget.onTap,
       onPanStart: (details) => _updateTilt(details.localPosition, context.size ?? Size.zero),
@@ -57,24 +79,7 @@ class _Parallax3DImageState extends State<Parallax3DImage> {
           ..setEntry(3, 2, 0.0015)
           ..rotateX(_tiltX)
           ..rotateY(_tiltY),
-        child: Hero(
-          tag: widget.heroTag,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(widget.borderRadius),
-            child: Image.network(
-              widget.imageUrl,
-              fit: BoxFit.cover,
-              height: widget.height ?? 180,
-              width: double.infinity,
-              loadingBuilder: (context, child, progress) {
-                if (progress == null) return child;
-                return Container(
-                  color: Colors.black12,
-                );
-              },
-            ),
-          ),
-        ),
+        child: image,
       ),
     );
   }

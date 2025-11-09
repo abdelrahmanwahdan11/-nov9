@@ -107,6 +107,7 @@ class OverlaySheet extends StatelessWidget {
                         child: Parallax3DImage(
                           imageUrl: event.imageUrl,
                           heroTag: 'event_card_${event.id}',
+                          enableHero: false,
                           onTap: controller.toggleFlip,
                         ),
                       ),

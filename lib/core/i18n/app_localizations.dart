@@ -59,12 +59,115 @@ class AppLocalizations {
     'email': {'en': 'Email', 'ar': 'البريد الإلكتروني'},
     'password': {'en': 'Password', 'ar': 'كلمة المرور'},
     'confirm_password': {'en': 'Confirm Password', 'ar': 'تأكيد كلمة المرور'},
+    'password_rule_length': {
+      'en': 'At least 8 characters',
+      'ar': 'ثمانية أحرف على الأقل',
+    },
+    'password_rule_upper': {
+      'en': 'Uppercase letter',
+      'ar': 'حرف كبير',
+    },
+    'password_rule_lower': {
+      'en': 'Lowercase letter',
+      'ar': 'حرف صغير',
+    },
+    'password_rule_number': {
+      'en': 'Number',
+      'ar': 'رقم',
+    },
+    'password_rule_symbol': {
+      'en': 'Symbol',
+      'ar': 'رمز',
+    },
+    'password_strength_weak': {
+      'en': 'Strength: Weak',
+      'ar': 'القوة: ضعيفة',
+    },
+    'password_strength_fair': {
+      'en': 'Strength: Fair',
+      'ar': 'القوة: متوسطة',
+    },
+    'password_strength_strong': {
+      'en': 'Strength: Strong',
+      'ar': 'القوة: قوية',
+    },
     'remember_me': {'en': 'Remember me', 'ar': 'تذكرني'},
     'continue_guest': {'en': 'Continue as guest', 'ar': 'المتابعة كضيف'},
     'home': {'en': 'Home', 'ar': 'الرئيسية'},
     'search': {'en': 'Search', 'ar': 'بحث'},
     'catalog': {'en': 'Catalog', 'ar': 'كتالوج'},
+    'catalog_view_list': {'en': 'List view', 'ar': 'عرض قائمة'},
+    'catalog_view_grid': {'en': 'Grid view', 'ar': 'عرض شبكة'},
+    'catalog_search_hint': {
+      'en': 'Search your collectibles',
+      'ar': 'ابحث في مقتنياتك',
+    },
+    'catalog_stats_total': {'en': 'Total', 'ar': 'الإجمالي'},
+    'catalog_stats_for_sale': {'en': 'For sale', 'ar': 'للبيع'},
+    'catalog_stats_kept': {'en': 'Kept', 'ar': 'محفوظ'},
+    'catalog_stats_compare': {'en': 'Compare', 'ar': 'المقارنة'},
+    'catalog_target_matches': {
+      'en': 'Close to target price',
+      'ar': 'قريب من السعر المستهدف',
+    },
+    'catalog_filters_conditions': {
+      'en': 'Filter by condition',
+      'ar': 'التصفية حسب الحالة',
+    },
+    'catalog_filters_sale_only': {
+      'en': 'Show items listed for sale only',
+      'ar': 'عرض المعروض للبيع فقط',
+    },
+    'catalog_filters_price': {
+      'en': 'Price range (USD)',
+      'ar': 'نطاق السعر (دولار)',
+    },
+    'catalog_sort_label': {'en': 'Sort items', 'ar': 'ترتيب المقتنيات'},
+    'catalog_sort_name': {'en': 'Name A-Z', 'ar': 'الاسم من أ إلى ي'},
+    'catalog_sort_condition': {'en': 'Condition', 'ar': 'الحالة'},
+    'catalog_sort_price_low': {
+      'en': 'Price: low to high',
+      'ar': 'السعر: من الأقل إلى الأعلى',
+    },
+    'catalog_sort_price_high': {
+      'en': 'Price: high to low',
+      'ar': 'السعر: من الأعلى إلى الأقل',
+    },
+    'catalog_results_count': {
+      'en': 'Showing {count} items',
+      'ar': 'عرض {count} مقتنيات',
+    },
+    'catalog_empty': {
+      'en': 'No collectibles match your filters yet.',
+      'ar': 'لا توجد مقتنيات مطابقة لمرشحاتك بعد.',
+    },
     'my_items': {'en': 'My Items', 'ar': 'مقتنياتي'},
+    'my_items_tab_kept': {'en': 'Kept', 'ar': 'محفوظة'},
+    'my_items_tab_listed': {'en': 'Listed', 'ar': 'معروضة'},
+    'my_items_kept_title': {
+      'en': 'Your kept collection',
+      'ar': 'مقتنياتك المحفوظة',
+    },
+    'my_items_kept_count': {
+      'en': 'You are keeping {count} pieces',
+      'ar': 'تحتفظ بـ {count} مقتنيات',
+    },
+    'my_items_listed_title': {
+      'en': 'Marketplace listings',
+      'ar': 'القوائم المعروضة',
+    },
+    'my_items_listed_count': {
+      'en': 'You listed {count} pieces',
+      'ar': 'عرضت {count} مقتنيات',
+    },
+    'my_items_recent': {'en': 'Recently added', 'ar': 'أضيفت حديثًا'},
+    'my_items_metric_total': {'en': 'Items', 'ar': 'المقتنيات'},
+    'my_items_metric_condition': {
+      'en': 'Avg. condition',
+      'ar': 'متوسط الحالة',
+    },
+    'my_items_tips_title': {'en': 'Care tips', 'ar': 'نصائح العناية'},
+    'my_items_unknown_item': {'en': 'Unknown item', 'ar': 'مقتنى غير معروف'},
     'settings': {'en': 'Settings', 'ar': 'الإعدادات'},
     'ingest_article': {'en': 'Ingest Article', 'ar': 'تحليل المقالة'},
     'notifications': {'en': 'Notifications', 'ar': 'الإشعارات'},
@@ -221,6 +324,74 @@ class AppLocalizations {
       'en': 'Confirm',
       'ar': 'تأكيد',
     },
+    'required': {
+      'en': 'Required',
+      'ar': 'إلزامي',
+    },
+    'items_composer_image': {
+      'en': 'Cover image',
+      'ar': 'صورة الغلاف',
+    },
+    'items_composer_image_url': {
+      'en': 'Image URL',
+      'ar': 'رابط الصورة',
+    },
+    'items_composer_name': {
+      'en': 'Item name',
+      'ar': 'اسم المقتنى',
+    },
+    'items_composer_brand': {
+      'en': 'Brand',
+      'ar': 'العلامة التجارية',
+    },
+    'items_composer_year': {
+      'en': 'Year',
+      'ar': 'السنة',
+    },
+    'items_composer_condition': {
+      'en': 'Condition',
+      'ar': 'الحالة',
+    },
+    'items_composer_notes': {
+      'en': 'Notes',
+      'ar': 'ملاحظات',
+    },
+    'items_composer_specs': {
+      'en': 'Specifications',
+      'ar': 'المواصفات',
+    },
+    'items_composer_spec_key': {
+      'en': 'Label',
+      'ar': 'المسمى',
+    },
+    'items_composer_spec_value': {
+      'en': 'Value',
+      'ar': 'القيمة',
+    },
+    'items_composer_add_spec': {
+      'en': 'Add specification',
+      'ar': 'إضافة مواصفة',
+    },
+    'items_composer_for_sale': {
+      'en': 'List for sale',
+      'ar': 'عرض للبيع',
+    },
+    'items_composer_for_sale_hint': {
+      'en': 'Buyers will see this item in the marketplace.',
+      'ar': 'سيظهر هذا المقتنى للمشترين في السوق.',
+    },
+    'items_composer_price': {
+      'en': 'Asking price (USD)',
+      'ar': 'سعر العرض (دولار)',
+    },
+    'items_composer_target': {
+      'en': 'Target price (USD)',
+      'ar': 'السعر المستهدف (دولار)',
+    },
+    'item_condition_new_': {'en': 'New', 'ar': 'جديد'},
+    'item_condition_like_new': {'en': 'Like new', 'ar': 'بحالة ممتازة'},
+    'item_condition_used': {'en': 'Used', 'ar': 'مستعمل'},
+    'item_condition_needs_fix': {'en': 'Needs repair', 'ar': 'يحتاج إلى إصلاح'},
     'items_target_price': {
       'en': 'Target price: {price} USD',
       'ar': 'السعر المستهدف: {price} دولار',

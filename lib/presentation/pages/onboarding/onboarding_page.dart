@@ -145,23 +145,34 @@ class _OnboardingSlideView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(32),
-              child: Image.network(slide.image, fit: BoxFit.cover, width: double.infinity),
-            ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(32),
+                  child: Image.network(slide.image, fit: BoxFit.cover, width: double.infinity),
+                ),
+              ),
+              const SizedBox(height: 32),
+              Text(
+                slide.title,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                slide.subtitle,
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+              const SizedBox(height: 56),
+            ],
           ),
-          const SizedBox(height: 24),
-          Text(slide.title, style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
-          const SizedBox(height: 12),
-          Text(slide.subtitle, style: Theme.of(context).textTheme.bodyLarge),
-        ],
-      ),
+        );
+      },
     );
   }
 }

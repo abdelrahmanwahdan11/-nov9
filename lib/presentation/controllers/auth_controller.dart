@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
 class AuthController extends ChangeNotifier {
+  AuthController() {
+    passwordController.addListener(_onPasswordChanged);
+  }
+
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
@@ -12,6 +16,12 @@ class AuthController extends ChangeNotifier {
   bool get obscure => _obscure;
   bool get rememberMe => _rememberMe;
   double get strength => _strength;
+
+  bool get hasMinLength => passwordController.text.trim().length >= 8;
+  bool get hasUppercase => RegExp(r'[A-Z]').hasMatch(passwordController.text);
+  bool get hasLowercase => RegExp(r'[a-z]').hasMatch(passwordController.text);
+  bool get hasNumber => RegExp(r'[0-9]').hasMatch(passwordController.text);
+  bool get hasSymbol => RegExp(r'[^A-Za-z0-9]').hasMatch(passwordController.text);
 
   void toggleObscure() {
     _obscure = !_obscure;
@@ -36,11 +46,12 @@ class AuthController extends ChangeNotifier {
 
   String? validatePassword(String? value) {
     if (value == null || value.isEmpty) {
+      _updateStrength(0);
       return 'Password required';
     }
-    _strength = _calculateStrength(value);
-    notifyListeners();
-    if (_strength < 0.3) {
+    final score = _calculateStrength(value);
+    _updateStrength(score);
+    if (score < 0.3) {
       return 'Weak password';
     }
     return null;
@@ -51,6 +62,22 @@ class AuthController extends ChangeNotifier {
       return 'Passwords do not match';
     }
     return null;
+  }
+
+  void _onPasswordChanged() {
+    final text = passwordController.text;
+    if (text.isEmpty) {
+      _updateStrength(0);
+      return;
+    }
+    _updateStrength(_calculateStrength(text));
+  }
+
+  void _updateStrength(double value) {
+    if ((_strength - value).abs() > 0.001) {
+      _strength = value;
+    }
+    notifyListeners();
   }
 
   double _calculateStrength(String password) {
@@ -64,6 +91,7 @@ class AuthController extends ChangeNotifier {
   }
 
   void disposeControllers() {
+    passwordController.removeListener(_onPasswordChanged);
     emailController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();

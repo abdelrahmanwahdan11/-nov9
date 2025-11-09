@@ -188,7 +188,48 @@ class _SignUpForm extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    LinearProgressIndicator(value: controller.strength),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        LinearProgressIndicator(
+                          value: controller.strength,
+                          color: _strengthColor(context, controller.strength),
+                          backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          _strengthLabel(l10n, controller.strength),
+                          style: Theme.of(context).textTheme.labelMedium,
+                        ),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 6,
+                          children: [
+                            _RequirementChip(
+                              label: l10n.translate('password_rule_length'),
+                              met: controller.hasMinLength,
+                            ),
+                            _RequirementChip(
+                              label: l10n.translate('password_rule_upper'),
+                              met: controller.hasUppercase,
+                            ),
+                            _RequirementChip(
+                              label: l10n.translate('password_rule_lower'),
+                              met: controller.hasLowercase,
+                            ),
+                            _RequirementChip(
+                              label: l10n.translate('password_rule_number'),
+                              met: controller.hasNumber,
+                            ),
+                            _RequirementChip(
+                              label: l10n.translate('password_rule_symbol'),
+                              met: controller.hasSymbol,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ],
                 );
               },
@@ -253,6 +294,60 @@ class _ForgotForm extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+Color _strengthColor(BuildContext context, double value) {
+  final theme = Theme.of(context);
+  if (value < 0.3) {
+    return theme.colorScheme.error;
+  }
+  if (value < 0.7) {
+    return theme.colorScheme.tertiary;
+  }
+  return theme.colorScheme.primary;
+}
+
+String _strengthLabel(AppLocalizations l10n, double value) {
+  if (value < 0.3) {
+    return l10n.translate('password_strength_weak');
+  }
+  if (value < 0.7) {
+    return l10n.translate('password_strength_fair');
+  }
+  return l10n.translate('password_strength_strong');
+}
+
+class _RequirementChip extends StatelessWidget {
+  const _RequirementChip({required this.label, required this.met});
+
+  final String label;
+  final bool met;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color = met ? theme.colorScheme.primary : theme.colorScheme.surfaceVariant;
+    final textColor = met ? theme.colorScheme.onPrimary : theme.colorScheme.onSurfaceVariant;
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withOpacity(met ? 0.9 : 0.5),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(met ? Icons.check_circle : Icons.radio_button_unchecked, size: 16, color: textColor),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: theme.textTheme.labelSmall?.copyWith(color: textColor, fontWeight: FontWeight.w600),
+          ),
+        ],
       ),
     );
   }

@@ -13,6 +13,7 @@ class ItemTile extends StatelessWidget {
     required this.onLongPress,
     required this.color,
     this.selected = false,
+    this.enableHero = true,
   });
 
   final Item item;
@@ -20,6 +21,7 @@ class ItemTile extends StatelessWidget {
   final VoidCallback onLongPress;
   final Color color;
   final bool selected;
+  final bool enableHero;
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +38,7 @@ class ItemTile extends StatelessWidget {
                 Parallax3DImage(
                   imageUrl: item.imageUrl,
                   heroTag: 'item_card_${item.id}',
+                  enableHero: enableHero,
                   onTap: onTap,
                 ),
                 const SizedBox(height: 16),
