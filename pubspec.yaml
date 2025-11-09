@@ -1,0 +1,25 @@
+name: daily_bubble_digest
+description: A bilingual daily digest app with collectibles catalog.
+publish_to: 'none'
+version: 1.0.0+1
+environment:
+  sdk: ">=3.4.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  google_fonts: ^6.2.1
+  shared_preferences: ^2.3.2
+  animations: ^2.0.11
+  iconly: ^1.0.0
+  equatable: ^2.0.5
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
