@@ -1,4 +1,5 @@
 import '../../data/models/item.dart';
+import '../../data/models/offer.dart';
 import '../../data/services/mock_items_service.dart';
 
 class ItemManagementUseCase {
@@ -14,4 +15,6 @@ class ItemManagementUseCase {
       _service.setForSale(id, forSale, price: price);
 
   Future<void> setTargetPrice(String id, double? price) => _service.setTargetPrice(id, price);
+
+  Stream<Offer> get notifications => _service.notifications;
 }

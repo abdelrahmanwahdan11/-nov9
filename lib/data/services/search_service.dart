@@ -19,8 +19,8 @@ class SearchService {
     Set<String>? tags,
     Set<String>? sources,
   }) {
-    final lower = query.toLowerCase();
-    return events
+    final normalized = query.trim().toLowerCase();
+    final results = events
         .where((event) {
           if (categories != null && categories.isNotEmpty && !categories.contains(event.category)) {
             return false;
@@ -42,7 +42,7 @@ class SearchService {
         .map(
           (event) => SearchResult(
             item: event,
-            score: _matchScore(lower, [
+            score: _matchScore(normalized, [
               event.title,
               event.summary,
               event.details,
@@ -51,8 +51,15 @@ class SearchService {
           ),
         )
         .where((result) => result.score > 0)
-        .toList()
-      ..sort((a, b) => b.score.compareTo(a.score));
+        .toList();
+    results.sort((a, b) {
+      final scoreCompare = b.score.compareTo(a.score);
+      if (scoreCompare != 0) {
+        return scoreCompare;
+      }
+      return b.item.date.compareTo(a.item.date);
+    });
+    return results;
   }
 
   List<SearchResult<Item>> searchItems(
@@ -63,8 +70,8 @@ class SearchService {
     double? minPrice,
     double? maxPrice,
   }) {
-    final lower = query.toLowerCase();
-    return items
+    final normalized = query.trim().toLowerCase();
+    final results = items
         .where((item) {
           if (conditions != null && conditions.isNotEmpty && !conditions.contains(item.condition)) {
             return false;
@@ -84,7 +91,7 @@ class SearchService {
         .map(
           (item) => SearchResult(
             item: item,
-            score: _matchScore(lower, [
+            score: _matchScore(normalized, [
               item.name,
               item.specs.values.join(' '),
               item.notes ?? '',
@@ -93,13 +100,25 @@ class SearchService {
           ),
         )
         .where((result) => result.score > 0)
-        .toList()
-      ..sort((a, b) => b.score.compareTo(a.score));
+        .toList();
+    results.sort((a, b) {
+      final scoreCompare = b.score.compareTo(a.score);
+      if (scoreCompare != 0) {
+        return scoreCompare;
+      }
+      if (a.item.forSale != b.item.forSale) {
+        return b.item.forSale ? 1 : -1;
+      }
+      final aPrice = a.item.askingPrice ?? a.item.targetPrice ?? 0;
+      final bPrice = b.item.askingPrice ?? b.item.targetPrice ?? 0;
+      return bPrice.compareTo(aPrice);
+    });
+    return results;
   }
 
   double _matchScore(String query, List<String> haystacks) {
     if (query.isEmpty) {
-      return 0;
+      return 1;
     }
     var score = 0.0;
     for (final text in haystacks) {

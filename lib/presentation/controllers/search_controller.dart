@@ -1,3 +1,4 @@
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -31,10 +32,51 @@ class SearchPageController extends ChangeNotifier {
   double? minPrice;
   double? maxPrice;
 
+  Set<String> _availableTags = {};
+  Set<String> _availableSources = {};
+  double? _priceFloor;
+  double? _priceCeiling;
+
   void configure(List<Event> events, List<Item> items) {
+    syncData(events, items, forceRefresh: true);
+  }
+
+  void syncData(List<Event> events, List<Item> items, {bool forceRefresh = false}) {
+    final eventsChanged = !identical(_events, events);
+    final itemsChanged = !identical(_items, items);
+    if (!eventsChanged && !itemsChanged && !forceRefresh) {
+      return;
+    }
     _events = events;
     _items = items;
+    _collectFacets();
+    if (_query.isNotEmpty || hasActiveFilters || forceRefresh) {
+      _performSearch();
+    } else {
+      notifyListeners();
+    }
+  }
+
+  void triggerSearch() {
     _performSearch();
+  }
+
+  void replaceQuery(String value) {
+    if (queryController.text != value) {
+      queryController.value = TextEditingValue(
+        text: value,
+        selection: TextSelection.collapsed(offset: value.length),
+      );
+    }
+    onQueryChanged(value);
+  }
+
+  void clearQuery() {
+    if (queryController.text.isEmpty) {
+      return;
+    }
+    queryController.clear();
+    onQueryChanged('');
   }
 
   void onQueryChanged(String value) {
@@ -123,6 +165,52 @@ class SearchPageController extends ChangeNotifier {
     _performSearch();
   }
 
+  bool get hasActiveFilters =>
+      eventCategories.length != EventCategory.values.length ||
+      eventDateRange != null ||
+      eventTags.isNotEmpty ||
+      eventSources.isNotEmpty ||
+      itemConditions.length != ItemCondition.values.length ||
+      itemsForSale != null ||
+      minPrice != null ||
+      maxPrice != null;
+
+  Set<String> get availableTags => _availableTags;
+  Set<String> get availableSources => _availableSources;
+
+  List<String> get sortedTags {
+    final tags = _availableTags.toList()..sort();
+    return tags;
+  }
+
+  List<String> get sortedSources {
+    final sources = _availableSources.toList()..sort();
+    return sources;
+  }
+
+  bool get hasPriceData => _priceFloor != null && _priceCeiling != null;
+
+  double get priceFloor => _priceFloor ?? 0;
+
+  double get priceCeiling {
+    if (_priceCeiling != null && _priceFloor != null && _priceCeiling! > _priceFloor!) {
+      return _priceCeiling!;
+    }
+    return (_priceFloor ?? 0) + 100;
+  }
+
+  double get effectiveMinPrice => minPrice ?? priceFloor;
+  double get effectiveMaxPrice => maxPrice ?? priceCeiling;
+
+  List<String> get quickSuggestions {
+    final ordered = <String>{};
+    ordered.addAll(sortedTags);
+    ordered.addAll(sortedSources);
+    return ordered.take(6).toList();
+  }
+
+  String get query => _query;
+
   void _performSearch() {
     final results = _useCase(
       _events,
@@ -141,6 +229,26 @@ class SearchPageController extends ChangeNotifier {
     eventResults = results.events;
     itemResults = results.items;
     notifyListeners();
+  }
+
+  void _collectFacets() {
+    _availableTags = _events.expand((event) => event.tags).where((tag) => tag.isNotEmpty).toSet();
+    _availableSources = _events.map((event) => event.source).where((source) => source.isNotEmpty).toSet();
+    final prices = _items
+        .map((item) => item.askingPrice ?? item.targetPrice)
+        .whereType<double>()
+        .toList()
+      ..sort();
+    if (prices.isEmpty) {
+      _priceFloor = null;
+      _priceCeiling = null;
+    } else {
+      _priceFloor = prices.first.floorToDouble();
+      _priceCeiling = prices.last.ceilToDouble();
+      if (_priceCeiling == _priceFloor) {
+        _priceCeiling = _priceFloor! + 100;
+      }
+    }
   }
 
   Set<EventCategory> _parseCategories(List<dynamic>? raw) {
@@ -188,8 +296,6 @@ class SearchPageController extends ChangeNotifier {
     }
     return parsed;
   }
-
-  String get query => _query;
 
   @override
   void dispose() {

@@ -10,11 +10,13 @@ import '../../domain/usecases/item_management_usecase.dart';
 class ItemsController extends ChangeNotifier {
   ItemsController(this._getItems, this._manage) {
     _subscription = _getItems().listen(_onData);
+    _offersSubscription = _manage.notifications.listen(_onOffer);
   }
 
   final GetItemsUseCase _getItems;
   final ItemManagementUseCase _manage;
   late final StreamSubscription<List<Item>> _subscription;
+  late final StreamSubscription<Offer> _offersSubscription;
 
   final compareList = <Item>[];
   final _items = <Item>[];
@@ -81,9 +83,23 @@ class ItemsController extends ChangeNotifier {
     return (key: 'items.tip_low', args: {'name': item.name});
   }
 
+  void dismissLatestOffer() {
+    if (latestOffer == null) {
+      return;
+    }
+    latestOffer = null;
+    notifyListeners();
+  }
+
+  void _onOffer(Offer offer) {
+    latestOffer = offer;
+    notifyListeners();
+  }
+
   @override
   void dispose() {
     _subscription.cancel();
+    _offersSubscription.cancel();
     super.dispose();
   }
 }

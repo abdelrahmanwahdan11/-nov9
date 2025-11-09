@@ -80,6 +80,203 @@ class AppLocalizations {
       'en': 'Consider a gentle restoration to refresh {name}.',
       'ar': 'فكر في ترميم خفيف لإنعاش {name}.',
     },
+
+    'search_intro': {
+      'en': 'Fine-tune today's feed with smart filters.',
+      'ar': 'اضبط خلاصتك اليوم باستخدام المرشحات الذكية.',
+    },
+    'search_saved_filters': {
+      'en': 'Saved filters',
+      'ar': 'المرشحات المحفوظة',
+    },
+    'search_saved_filters_empty': {
+      'en': 'Save your favorite filter combos to access them quickly here.',
+      'ar': 'احفظ تركيبات المرشحات المفضلة لديك للوصول إليها بسرعة هنا.',
+    },
+    'search_suggestions': {
+      'en': 'Quick suggestions',
+      'ar': 'اقتراحات سريعة',
+    },
+    'search_open_filters': {
+      'en': 'Open filters',
+      'ar': 'فتح المرشحات',
+    },
+    'search_results_count': {
+      'en': '{count} matches',
+      'ar': '{count} نتائج',
+    },
+    'search_events': {
+      'en': 'Events',
+      'ar': 'أحداث',
+    },
+    'search_items': {
+      'en': 'Collectibles',
+      'ar': 'مقتنيات',
+    },
+    'search_delete_filter': {
+      'en': 'Delete filter?',
+      'ar': 'حذف المرشح؟',
+    },
+    'search_saved_filter_applied': {
+      'en': 'Applied "{name}"',
+      'ar': 'تم تطبيق "{name}"',
+    },
+    'search_filter_deleted': {
+      'en': 'Filter removed',
+      'ar': 'تم حذف المرشح',
+    },
+    'search_filters_delete_confirm': {
+      'en': 'Remove "{name}" from saved filters?',
+      'ar': 'هل تريد إزالة "{name}" من المرشحات المحفوظة؟',
+    },
+    'search_filters_title': {
+      'en': 'Search filters',
+      'ar': 'مرشحات البحث',
+    },
+    'search_filters_categories': {
+      'en': 'Categories',
+      'ar': 'الفئات',
+    },
+    'search_filters_date_range': {
+      'en': 'Date range',
+      'ar': 'نطاق التاريخ',
+    },
+    'search_filters_any_time': {
+      'en': 'Any time',
+      'ar': 'أي وقت',
+    },
+    'search_filters_tags': {
+      'en': 'Tags',
+      'ar': 'وسوم',
+    },
+    'search_filters_sources': {
+      'en': 'Sources',
+      'ar': 'المصادر',
+    },
+    'search_filters_items_title': {
+      'en': 'Items filters',
+      'ar': 'مرشحات المقتنيات',
+    },
+    'search_filters_sale_state': {
+      'en': 'Sale status',
+      'ar': 'حالة البيع',
+    },
+    'search_filters_sale_state_any': {
+      'en': 'Any status',
+      'ar': 'أي حالة',
+    },
+    'search_filters_sale_state_for_sale': {
+      'en': 'For sale',
+      'ar': 'للبيع',
+    },
+    'search_filters_sale_state_keep': {
+      'en': 'Keep',
+      'ar': 'احتفظ',
+    },
+    'search_filters_price_range': {
+      'en': 'Price range (USD)',
+      'ar': 'نطاق السعر (دولار)',
+    },
+    'search_filters_name_hint': {
+      'en': 'Filter name',
+      'ar': 'اسم المرشح',
+    },
+    'search_filters_apply': {
+      'en': 'Apply',
+      'ar': 'تطبيق',
+    },
+    'search_filters_reset': {
+      'en': 'Reset',
+      'ar': 'إعادة تعيين',
+    },
+    'search_filters_save': {
+      'en': 'Save preset',
+      'ar': 'حفظ الإعداد',
+    },
+    'search_filter_saved': {
+      'en': 'Filter saved',
+      'ar': 'تم حفظ المرشح',
+    },
+    'confirm': {
+      'en': 'Confirm',
+      'ar': 'تأكيد',
+    },
+    'items_target_price': {
+      'en': 'Target price: {price} USD',
+      'ar': 'السعر المستهدف: {price} دولار',
+    },
+    'items_empty_state': {
+      'en': 'Add your collectibles to track offers and care tips.',
+      'ar': 'أضف مقتنياتك لمتابعة العروض ونصائح العناية.',
+    },
+    'items_offer_banner': {
+      'en': 'New offer from {from}',
+      'ar': 'عرض جديد من {from}',
+    },
+    'items_offer_amount': {
+      'en': 'Offer amount: {amount} USD',
+      'ar': 'قيمة العرض: {amount} دولار',
+    },
+    'items_offer_view': {
+      'en': 'View offer',
+      'ar': 'عرض التفاصيل',
+    },
+    'items_offer_dismiss': {
+      'en': 'Dismiss',
+      'ar': 'تجاهل',
+    },
+    'items_sale_status_listed': {
+      'en': 'Listed for sale',
+      'ar': 'معروض للبيع',
+    },
+    'items_sale_status_private': {
+      'en': 'Kept private',
+      'ar': 'محفوظ لديك',
+    },
+    'items_set_price': {
+      'en': 'Set asking price',
+      'ar': 'حدد سعر العرض',
+    },
+    'items_set_target': {
+      'en': 'Set target',
+      'ar': 'تعيين هدف',
+    },
+    'items_clear_target': {
+      'en': 'Clear target',
+      'ar': 'مسح الهدف',
+    },
+    'items_condition_score': {
+      'en': 'Condition score',
+      'ar': 'تقييم الحالة',
+    },
+    'items_mark_for_sale': {
+      'en': 'Item listed for sale',
+      'ar': 'تم إدراج المقتنى للبيع',
+    },
+    'items_mark_keep': {
+      'en': 'Item marked as kept',
+      'ar': 'تم وضع المقتنى كاحتفاظ',
+    },
+    'items_target_prompt': {
+      'en': 'Target price (USD)',
+      'ar': 'السعر المستهدف (دولار)',
+    },
+    'items_target_saved': {
+      'en': 'Target saved',
+      'ar': 'تم حفظ الهدف',
+    },
+    'items_price_hint': {
+      'en': 'Price (USD)',
+      'ar': 'السعر (دولار)',
+    },
+    'items_save': {
+      'en': 'Save',
+      'ar': 'حفظ',
+    },
+    'close': {
+      'en': 'Close',
+      'ar': 'إغلاق',
+    },
     'items.tip_low': {
       'en': "Plan a professional repair to protect {name}'s value.",
       'ar': 'خطط لصيانة احترافية للحفاظ على قيمة {name}.',

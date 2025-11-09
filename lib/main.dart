@@ -15,6 +15,7 @@ import 'domain/usecases/item_management_usecase.dart';
 import 'domain/usecases/refresh_events_usecase.dart';
 import 'domain/usecases/search_usecase.dart';
 import 'presentation/controllers/auth_controller.dart';
+import 'presentation/controllers/filters_controller.dart';
 import 'presentation/controllers/events_controller.dart';
 import 'presentation/controllers/items_controller.dart';
 import 'presentation/controllers/overlay_controller.dart';
@@ -42,6 +43,7 @@ void main() async {
   final itemsService = MockItemsService(prefs);
   final itemsController = ItemsController(GetItemsUseCase(itemsService), ItemManagementUseCase(itemsService));
   final searchController = SearchPageController(SearchUseCase(const SearchService()));
+  final filtersController = FiltersController(prefs);
   final authController = AuthController();
 
   final routerState = AppRouterState();
@@ -55,10 +57,12 @@ void main() async {
           itemsController: itemsController,
           settingsController: settingsController,
           searchController: searchController,
+          filtersController: filtersController,
           parser: localParser,
         ),
     AppPage.search: (context) => SearchPage(
           controller: searchController,
+          filtersController: filtersController,
           events: eventsController.events,
           items: itemsController.items,
         ),
@@ -69,6 +73,7 @@ void main() async {
           itemsController: itemsController,
           settingsController: settingsController,
           searchController: searchController,
+          filtersController: filtersController,
           parser: localParser,
           startIndex: 2,
         ),
@@ -79,6 +84,7 @@ void main() async {
           itemsController: itemsController,
           settingsController: settingsController,
           searchController: searchController,
+          filtersController: filtersController,
           parser: localParser,
           startIndex: 3,
         ),

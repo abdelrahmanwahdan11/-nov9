@@ -8,6 +8,7 @@ import '../../controllers/items_controller.dart';
 import '../../controllers/overlay_controller.dart';
 import '../../controllers/search_controller.dart';
 import '../../controllers/settings_controller.dart';
+import '../../controllers/filters_controller.dart';
 import '../catalog/catalog_page.dart';
 import '../my_items/my_items_page.dart';
 import '../search/search_page.dart';
@@ -23,6 +24,7 @@ class RootShell extends StatefulWidget {
     required this.itemsController,
     required this.settingsController,
     required this.searchController,
+    required this.filtersController,
     required this.parser,
     this.startIndex = 0,
   });
@@ -33,6 +35,7 @@ class RootShell extends StatefulWidget {
   final ItemsController itemsController;
   final SettingsController settingsController;
   final SearchPageController searchController;
+  final FiltersController filtersController;
   final LocalArticleParser parser;
   final int startIndex;
 
@@ -63,6 +66,7 @@ class _RootShellState extends State<RootShell> {
           ),
           SearchPage(
             controller: widget.searchController,
+            filtersController: widget.filtersController,
             events: widget.eventsController.events,
             items: widget.itemsController.items,
           ),
