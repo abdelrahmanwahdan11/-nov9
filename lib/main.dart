@@ -14,6 +14,7 @@ import 'data/services/on_this_day_service.dart';
 import 'data/services/forecast_service.dart';
 import 'data/services/scenario_service.dart';
 import 'data/services/notebook_service.dart';
+import 'data/services/risk_service.dart';
 import 'domain/usecases/get_events_usecase.dart';
 import 'domain/usecases/get_items_usecase.dart';
 import 'domain/usecases/item_management_usecase.dart';
@@ -30,6 +31,7 @@ import 'presentation/controllers/history_controller.dart';
 import 'presentation/controllers/forecast_controller.dart';
 import 'presentation/controllers/items_controller.dart';
 import 'presentation/controllers/notebook_controller.dart';
+import 'presentation/controllers/risk_controller.dart';
 import 'presentation/controllers/overlay_controller.dart';
 import 'presentation/controllers/search_controller.dart';
 import 'presentation/controllers/settings_controller.dart';
@@ -89,8 +91,14 @@ void main() async {
   final notebookController = NotebookController(
     ManageNotesUseCase(NotebookService(prefs)),
   );
+  final riskController = RiskController(
+    const RiskService(),
+    eventsController,
+    itemsController,
+  );
   await onThisDayController.load(force: true);
   await notebookController.initialize();
+  await riskController.initialize();
   eventsController.addListener(() {
     trendsController.update(eventsController.events);
   });
@@ -116,6 +124,7 @@ void main() async {
           forecastController: forecastController,
           scenarioController: scenarioController,
           notebookController: notebookController,
+          riskController: riskController,
         ),
     AppPage.briefing: (context) => RootShell(
           routerState: routerState,
@@ -133,6 +142,7 @@ void main() async {
           scenarioController: scenarioController,
           notebookController: notebookController,
           startIndex: 1,
+          riskController: riskController,
         ),
     AppPage.forecast: (context) => RootShell(
           routerState: routerState,
@@ -150,6 +160,7 @@ void main() async {
           scenarioController: scenarioController,
           notebookController: notebookController,
           startIndex: 2,
+          riskController: riskController,
         ),
     AppPage.scenario: (context) => RootShell(
           routerState: routerState,
@@ -167,6 +178,25 @@ void main() async {
           scenarioController: scenarioController,
           notebookController: notebookController,
           startIndex: 3,
+          riskController: riskController,
+        ),
+    AppPage.risk: (context) => RootShell(
+          routerState: routerState,
+          eventsController: eventsController,
+          overlayController: overlayController,
+          itemsController: itemsController,
+          settingsController: settingsController,
+          searchController: searchController,
+          filtersController: filtersController,
+          parser: localParser,
+          trendsController: trendsController,
+          bookmarksController: bookmarksController,
+          onThisDayController: onThisDayController,
+          forecastController: forecastController,
+          scenarioController: scenarioController,
+          notebookController: notebookController,
+          riskController: riskController,
+          startIndex: 4,
         ),
     AppPage.search: (context) => SearchPage(
           controller: searchController,
@@ -185,13 +215,14 @@ void main() async {
           searchController: searchController,
           filtersController: filtersController,
           parser: localParser,
-          startIndex: 6,
+          startIndex: 7,
           trendsController: trendsController,
           bookmarksController: bookmarksController,
           onThisDayController: onThisDayController,
           forecastController: forecastController,
           scenarioController: scenarioController,
           notebookController: notebookController,
+          riskController: riskController,
         ),
     AppPage.inventory: (context) => RootShell(
           routerState: routerState,
@@ -202,13 +233,14 @@ void main() async {
           searchController: searchController,
           filtersController: filtersController,
           parser: localParser,
-          startIndex: 7,
+          startIndex: 8,
           trendsController: trendsController,
           bookmarksController: bookmarksController,
           onThisDayController: onThisDayController,
           forecastController: forecastController,
           scenarioController: scenarioController,
           notebookController: notebookController,
+          riskController: riskController,
         ),
     AppPage.onThisDay: (context) => RootShell(
           routerState: routerState,
@@ -219,13 +251,14 @@ void main() async {
           searchController: searchController,
           filtersController: filtersController,
           parser: localParser,
-          startIndex: 5,
+          startIndex: 6,
           trendsController: trendsController,
           bookmarksController: bookmarksController,
           onThisDayController: onThisDayController,
           forecastController: forecastController,
           scenarioController: scenarioController,
           notebookController: notebookController,
+          riskController: riskController,
         ),
     AppPage.ingest: (context) => IngestArticlePage(parser: localParser, eventsController: eventsController),
     AppPage.notifications: (context) => NotificationsPage(itemsController: itemsController),

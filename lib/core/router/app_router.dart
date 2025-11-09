@@ -8,6 +8,7 @@ enum AppPage {
   briefing,
   forecast,
   scenario,
+  risk,
   notebook,
   search,
   onThisDay,

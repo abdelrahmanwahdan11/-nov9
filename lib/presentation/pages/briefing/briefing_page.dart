@@ -16,7 +16,9 @@ import '../../controllers/on_this_day_controller.dart';
 import '../../controllers/search_controller.dart';
 import '../../controllers/trends_controller.dart';
 import '../../controllers/notebook_controller.dart';
+import '../../controllers/risk_controller.dart';
 import '../../../data/models/strategy_note.dart';
+import '../../../data/models/risk_signal.dart';
 
 class BriefingPage extends StatelessWidget {
   const BriefingPage({
@@ -34,6 +36,8 @@ class BriefingPage extends StatelessWidget {
     required this.onOpenScenario,
     required this.notebookController,
     required this.onOpenNotebook,
+    required this.onOpenRisk,
+    required this.riskController,
   });
 
   final AppRouterState routerState;
@@ -49,6 +53,8 @@ class BriefingPage extends StatelessWidget {
   final VoidCallback onOpenScenario;
   final NotebookController notebookController;
   final VoidCallback onOpenNotebook;
+  final VoidCallback onOpenRisk;
+  final RiskController riskController;
 
   @override
   Widget build(BuildContext context) {
@@ -61,6 +67,7 @@ class BriefingPage extends StatelessWidget {
         onThisDayController,
         filtersController,
         notebookController,
+        riskController,
       ]),
       builder: (context, _) {
         final l10n = AppLocalizations.of(context);
@@ -82,6 +89,9 @@ class BriefingPage extends StatelessWidget {
         final trackedItems = itemsController.items;
         final timelinePreview = onThisDayController.events;
         final notebookEntries = notebookController.notes;
+        final riskHighlights = riskController.spotlightSignals;
+        final riskAverage = riskController.averageSeverity;
+        final riskActions = riskController.recommendedActions;
 
         return Scaffold(
           appBar: AppBar(
@@ -107,16 +117,27 @@ class BriefingPage extends StatelessWidget {
               const SizedBox(height: 24),
               _QuickActions(
                 l10n: l10n,
-                onShowSearch: () => onSelectTab(4),
+                onShowSearch: () => onSelectTab(5),
                 onOpenIngest: () => routerState.push(AppPage.ingest),
-                onShowTimeline: () => onSelectTab(5),
-                onShowInventory: () => onSelectTab(7),
+                onShowTimeline: () => onSelectTab(6),
+                onShowInventory: () => onSelectTab(8),
                 onOpenTrends: () => routerState.push(AppPage.trends),
                 onOpenShare: () => routerState.push(AppPage.sharePoster),
                 onOpenForecast: onOpenForecast,
                 onOpenScenario: onOpenScenario,
                 onOpenNotebook: onOpenNotebook,
+                onOpenRisk: onOpenRisk,
               ),
+              if (riskHighlights.isNotEmpty) ...[
+                const SizedBox(height: 24),
+                _RiskPreview(
+                  l10n: l10n,
+                  riskAverage: riskAverage,
+                  highlights: riskHighlights,
+                  actions: riskActions,
+                  onOpenRisk: onOpenRisk,
+                ),
+              ],
               if (categoryStats.isNotEmpty) ...[
                 const SizedBox(height: 24),
                 _CategoryBreakdown(stats: categoryStats, l10n: l10n),
@@ -129,7 +150,7 @@ class BriefingPage extends StatelessWidget {
               _SavedFiltersCard(
                 l10n: l10n,
                 filters: savedFilters,
-                onManage: () => onSelectTab(3),
+                onManage: () => onSelectTab(5),
                 onApply: (filter) => _applyFilter(context, filter, l10n),
               ),
               const SizedBox(height: 24),
@@ -142,7 +163,7 @@ class BriefingPage extends StatelessWidget {
               _ItemsPreview(
                 items: trackedItems,
                 l10n: l10n,
-                onOpenInventory: () => onSelectTab(6),
+                onOpenInventory: () => onSelectTab(8),
               ),
               const SizedBox(height: 24),
               _NotebookPreview(
@@ -155,7 +176,7 @@ class BriefingPage extends StatelessWidget {
               _HistoricalPreview(
                 events: timelinePreview,
                 l10n: l10n,
-                onOpenTimeline: () => onSelectTab(4),
+                onOpenTimeline: () => onSelectTab(6),
               ),
             ],
           ),
@@ -173,7 +194,7 @@ class BriefingPage extends StatelessWidget {
         ),
       ),
     );
-    onSelectTab(3);
+    onSelectTab(5);
   }
 }
 
@@ -291,6 +312,7 @@ class _QuickActions extends StatelessWidget {
     required this.onOpenForecast,
     required this.onOpenScenario,
     required this.onOpenNotebook,
+    required this.onOpenRisk,
   });
 
   final AppLocalizations l10n;
@@ -303,12 +325,14 @@ class _QuickActions extends StatelessWidget {
   final VoidCallback onOpenForecast;
   final VoidCallback onOpenScenario;
   final VoidCallback onOpenNotebook;
+  final VoidCallback onOpenRisk;
 
   @override
   Widget build(BuildContext context) {
     final actions = [
       _QuickAction(IconlyLight.chart, l10n.translate('briefing_action_forecast'), onOpenForecast),
       _QuickAction(IconlyLight.document, l10n.translate('briefing_action_scenario'), onOpenScenario),
+      _QuickAction(IconlyLight.shield_done, l10n.translate('briefing_action_risk'), onOpenRisk),
       _QuickAction(IconlyLight.search, l10n.translate('briefing_action_search'), onShowSearch),
       _QuickAction(IconlyLight.edit, l10n.translate('briefing_action_ingest'), onOpenIngest),
       _QuickAction(IconlyLight.calendar, l10n.translate('briefing_action_on_this_day'), onShowTimeline),
@@ -718,6 +742,148 @@ class _SavedFiltersCard extends StatelessWidget {
                   );
                 }).toList(),
               ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _RiskPreview extends StatelessWidget {
+  const _RiskPreview({
+    required this.l10n,
+    required this.riskAverage,
+    required this.highlights,
+    required this.actions,
+    required this.onOpenRisk,
+  });
+
+  final AppLocalizations l10n;
+  final double riskAverage;
+  final List<RiskSignal> highlights;
+  final List<String> actions;
+  final VoidCallback onOpenRisk;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final actionLabels = actions.take(3).toList();
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+      color: theme.colorScheme.surfaceVariant.withOpacity(0.35),
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.translate('risk_dashboard_title'),
+                        style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        l10n.translateWithArgs('risk_preview_summary', {
+                          'value': (riskAverage * 100).toStringAsFixed(0),
+                          'count': highlights.length.toString(),
+                        }),
+                        style: theme.textTheme.bodyMedium,
+                      ),
+                    ],
+                  ),
+                ),
+                FilledButton(
+                  onPressed: onOpenRisk,
+                  child: Text(l10n.translate('risk_nav')),
+                ),
+              ],
+            ),
+            if (actionLabels.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              Text(
+                l10n.translate('risk_preview_actions_label'),
+                style: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w700),
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: actionLabels
+                    .map(
+                      (action) => Chip(
+                        label: Text(l10n.translate(action)),
+                        avatar: const Icon(Icons.bolt, size: 18),
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                    )
+                    .toList(),
+              ),
+            ],
+            const SizedBox(height: 16),
+            Text(
+              l10n.translate('risk_preview_highlights'),
+              style: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              height: 140,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: highlights.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 12),
+                itemBuilder: (context, index) {
+                  final signal = highlights[index];
+                  return Container(
+                    width: 220,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(24),
+                      color: theme.colorScheme.surface,
+                      boxShadow: [
+                        BoxShadow(
+                          color: theme.shadowColor.withOpacity(0.04),
+                          blurRadius: 10,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.translate(signal.title),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          l10n.translate(signal.summary),
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.bodySmall,
+                        ),
+                        const Spacer(),
+                        Row(
+                          children: [
+                            const Icon(Icons.speed, size: 16),
+                            const SizedBox(width: 6),
+                            Text('${(signal.severity * 100).toStringAsFixed(0)}%'),
+                          ],
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
           ],
         ),
       ),

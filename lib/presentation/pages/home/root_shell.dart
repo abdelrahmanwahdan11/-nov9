@@ -16,6 +16,7 @@ import '../../controllers/trends_controller.dart';
 import '../../controllers/forecast_controller.dart';
 import '../../controllers/scenario_controller.dart';
 import '../../controllers/notebook_controller.dart';
+import '../../controllers/risk_controller.dart';
 import '../briefing/briefing_page.dart';
 import '../forecast/forecast_lab_page.dart';
 import '../inventory/inventory_page.dart';
@@ -24,6 +25,7 @@ import '../search/search_page.dart';
 import '../settings/settings_page.dart';
 import '../on_this_day/on_this_day_page.dart';
 import '../on_this_day/global_spotlight_page.dart';
+import '../risk/risk_dashboard_page.dart';
 import 'home_page.dart';
 
 class RootShell extends StatefulWidget {
@@ -43,6 +45,7 @@ class RootShell extends StatefulWidget {
     required this.forecastController,
     required this.scenarioController,
     required this.notebookController,
+    required this.riskController,
     this.startIndex = 0,
   });
 
@@ -60,6 +63,7 @@ class RootShell extends StatefulWidget {
   final ForecastController forecastController;
   final ScenarioController scenarioController;
   final NotebookController notebookController;
+  final RiskController riskController;
   final int startIndex;
 
   @override
@@ -88,6 +92,7 @@ class _RootShellState extends State<RootShell> {
         widget.forecastController,
         widget.scenarioController,
         widget.notebookController,
+        widget.riskController,
       ]),
       builder: (context, _) {
         final l10n = AppLocalizations.of(context);
@@ -118,9 +123,12 @@ class _RootShellState extends State<RootShell> {
             onOpenForecast: () => setState(() => _index = 2),
             onOpenScenario: () => setState(() => _index = 3),
             onOpenNotebook: () => widget.routerState.push(AppPage.notebook),
+            onOpenRisk: () => setState(() => _index = 4),
+            riskController: widget.riskController,
           ),
           ForecastLabPage(controller: widget.forecastController),
           ScenarioPlannerPage(controller: widget.scenarioController),
+          RiskDashboardPage(controller: widget.riskController),
           SearchPage(
             controller: widget.searchController,
             filtersController: widget.filtersController,
@@ -157,6 +165,7 @@ class _RootShellState extends State<RootShell> {
               NavigationDestination(icon: const Icon(IconlyLight.activity), label: l10n.translate('briefing_nav')),
               NavigationDestination(icon: const Icon(IconlyLight.chart), label: l10n.translate('forecast_nav')),
               NavigationDestination(icon: const Icon(IconlyLight.document), label: l10n.translate('scenario_nav')),
+              NavigationDestination(icon: const Icon(IconlyLight.shield_done), label: l10n.translate('risk_nav')),
               NavigationDestination(icon: const Icon(IconlyLight.search), label: l10n.translate('search')),
               NavigationDestination(icon: const Icon(IconlyLight.calendar), label: l10n.translate('on_this_day_nav')),
               NavigationDestination(icon: const Icon(IconlyLight.discovery), label: l10n.translate('global_spotlight_nav')),
