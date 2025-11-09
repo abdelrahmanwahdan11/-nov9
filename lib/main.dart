@@ -112,7 +112,10 @@ class DailyDigestApp extends StatelessWidget {
     return AnimatedBuilder(
       animation: settingsController,
       builder: (context, _) {
-        final theme = AppTheme(dynamicPrimary: settingsController.primaryColor);
+        final theme = AppTheme(
+          dynamicPrimary: settingsController.primaryColor,
+          locale: settingsController.locale,
+        );
         return MaterialApp.router(
           title: 'Daily Bubble Digest',
           debugShowCheckedModeBanner: false,

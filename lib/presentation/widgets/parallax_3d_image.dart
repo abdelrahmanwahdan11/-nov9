@@ -9,12 +9,14 @@ class Parallax3DImage extends StatefulWidget {
     required this.heroTag,
     this.borderRadius = 24,
     this.onTap,
+    this.height,
   });
 
   final String imageUrl;
   final String heroTag;
   final double borderRadius;
   final VoidCallback? onTap;
+  final double? height;
 
   @override
   State<Parallax3DImage> createState() => _Parallax3DImageState();
@@ -62,7 +64,7 @@ class _Parallax3DImageState extends State<Parallax3DImage> {
             child: Image.network(
               widget.imageUrl,
               fit: BoxFit.cover,
-              height: 180,
+              height: widget.height ?? 180,
               width: double.infinity,
               loadingBuilder: (context, child, progress) {
                 if (progress == null) return child;

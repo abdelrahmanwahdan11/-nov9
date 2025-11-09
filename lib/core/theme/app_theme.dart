@@ -4,13 +4,19 @@ import 'package:google_fonts/google_fonts.dart';
 import '../constants/design_tokens.dart';
 
 class AppTheme {
-  AppTheme({Color? dynamicPrimary})
-      : _dynamicPrimary = dynamicPrimary ?? DesignTokens.colors['dynamic_primary']!;
+  AppTheme({Color? dynamicPrimary, Locale? locale})
+      : _dynamicPrimary = dynamicPrimary ?? DesignTokens.colors['dynamic_primary']!,
+        _locale = locale ?? const Locale('en');
 
   final Color _dynamicPrimary;
+  final Locale _locale;
 
   ThemeData get light => _baseTheme(Brightness.light).copyWith(
-        scaffoldBackgroundColor: DesignTokens.colors['paper'],
+        scaffoldBackgroundColor: Color.lerp(
+          DesignTokens.colors['paper'],
+          _dynamicPrimary.withOpacity(0.35),
+          0.4,
+        ),
         colorScheme: ColorScheme.fromSeed(
           seedColor: _dynamicPrimary,
           brightness: Brightness.light,
@@ -30,16 +36,23 @@ class AppTheme {
       );
 
   ThemeData _baseTheme(Brightness brightness) {
+    final isArabic = _locale.languageCode == 'ar';
     final base = ThemeData(
       brightness: brightness,
       useMaterial3: true,
-      textTheme: GoogleFonts.interTextTheme(),
     );
 
-    final displayFont = GoogleFonts.urbanistTextTheme(base.textTheme);
+    final bodyTheme = isArabic
+        ? GoogleFonts.cairoTextTheme(base.textTheme)
+        : GoogleFonts.interTextTheme(base.textTheme);
+    final displayTheme = isArabic
+        ? GoogleFonts.tajawalTextTheme(bodyTheme)
+        : GoogleFonts.urbanistTextTheme(bodyTheme);
 
     return base.copyWith(
-      textTheme: displayFont,
+      textTheme: displayTheme,
+      primaryTextTheme: displayTheme,
+      fontFamily: displayTheme.bodyMedium?.fontFamily,
       appBarTheme: base.appBarTheme.copyWith(
         elevation: 0,
         backgroundColor: Colors.transparent,
@@ -50,17 +63,17 @@ class AppTheme {
       cardTheme: CardTheme(
         color: brightness == Brightness.dark
             ? const Color(0xFF173B3F)
-            : Colors.white,
+            : Colors.white.withOpacity(0.92),
         elevation: DesignTokens.elevations['md'],
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(28),
+          borderRadius: BorderRadius.circular(32),
         ),
       ),
       chipTheme: ChipThemeData(
         backgroundColor: brightness == Brightness.dark
             ? Colors.white.withOpacity(0.12)
             : DesignTokens.colors['mint']!,
-        selectedColor: _dynamicPrimary.withOpacity(0.8),
+        selectedColor: _dynamicPrimary.withOpacity(0.85),
         labelStyle: TextStyle(
           color: brightness == Brightness.dark
               ? Colors.white
@@ -72,6 +85,13 @@ class AppTheme {
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: _dynamicPrimary,
         foregroundColor: brightness == Brightness.dark ? Colors.black : Colors.white,
+      ),
+      scaffoldBackgroundColor: brightness == Brightness.dark
+          ? const Color(0xFF0B0C0E)
+          : Color.alphaBlend(_dynamicPrimary.withOpacity(0.12), DesignTokens.colors['paper']!),
+      dividerColor: Colors.black.withOpacity(0.08),
+      iconTheme: base.iconTheme.copyWith(
+        color: brightness == Brightness.dark ? Colors.white : Colors.black87,
       ),
     );
   }
