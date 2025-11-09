@@ -13,6 +13,7 @@ import '../../controllers/overlay_controller.dart';
 import '../../controllers/search_controller.dart';
 import '../../controllers/settings_controller.dart';
 import '../../controllers/trends_controller.dart';
+import '../briefing/briefing_page.dart';
 import '../inventory/inventory_page.dart';
 import '../search/search_page.dart';
 import '../settings/settings_page.dart';
@@ -72,6 +73,7 @@ class _RootShellState extends State<RootShell> {
         widget.settingsController,
         widget.bookmarksController,
         widget.onThisDayController,
+        widget.filtersController,
       ]),
       builder: (context, _) {
         final l10n = AppLocalizations.of(context);
@@ -87,6 +89,17 @@ class _RootShellState extends State<RootShell> {
             onOpenTopics: () => widget.routerState.push(AppPage.topics),
             onOpenSources: () => widget.routerState.push(AppPage.sources),
             trendsController: widget.trendsController,
+          ),
+          BriefingPage(
+            routerState: widget.routerState,
+            eventsController: widget.eventsController,
+            itemsController: widget.itemsController,
+            trendsController: widget.trendsController,
+            bookmarksController: widget.bookmarksController,
+            onThisDayController: widget.onThisDayController,
+            filtersController: widget.filtersController,
+            searchController: widget.searchController,
+            onSelectTab: (value) => setState(() => _index = value),
           ),
           SearchPage(
             controller: widget.searchController,
@@ -120,6 +133,7 @@ class _RootShellState extends State<RootShell> {
             },
             destinations: [
               NavigationDestination(icon: const Icon(IconlyLight.home), label: l10n.translate('home')),
+              NavigationDestination(icon: const Icon(IconlyLight.activity), label: l10n.translate('briefing_nav')),
               NavigationDestination(icon: const Icon(IconlyLight.search), label: l10n.translate('search')),
               NavigationDestination(icon: const Icon(IconlyLight.calendar), label: l10n.translate('on_this_day_nav')),
               NavigationDestination(icon: const Icon(IconlyLight.discovery), label: l10n.translate('global_spotlight_nav')),
