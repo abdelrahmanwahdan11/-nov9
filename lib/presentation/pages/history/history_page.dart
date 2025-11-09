@@ -53,98 +53,121 @@ class _HistoryPageState extends State<HistoryPage> {
         final l10n = AppLocalizations.of(context);
         final events = widget.controller.events;
         final filtered = _filtered(events);
-        return Scaffold(
-          appBar: AppBar(title: Text(l10n.translate('history'))),
-          body: Column(
-            children: [
-              CalendarDatePicker(
-                initialDate: widget.controller.selectedDate,
-                firstDate: DateTime.now().subtract(const Duration(days: 365)),
-                lastDate: DateTime.now().add(const Duration(days: 30)),
-                onDateChanged: widget.controller.loadFor,
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 12, 24, 8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      l10n.translate('history_filters_heading'),
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
-                    ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        ChoiceChip(
-                          label: Text(l10n.translate('all')),
-                          selected: _selectedCategory == null,
-                          onSelected: (_) => setState(() => _selectedCategory = null),
-                        ),
-                        ...EventCategory.values.map(
-                          (category) => ChoiceChip(
-                            label: Text(l10n.translate(category.name)),
-                            selected: _selectedCategory == category,
-                            onSelected: (selected) =>
-                                setState(() => _selectedCategory = selected ? category : null),
-                          ),
-                        ),
-                        FilterChip(
-                          label: Text(l10n.translate('history_bookmarked_only')),
-                          selected: _bookmarkedOnly,
-                          onSelected: (value) => setState(() => _bookmarkedOnly = value),
-                        ),
-                      ],
-                    ),
-                  ],
+        final summaryContent = <Widget>[
+          _HistorySummaryCard(events: events, l10n: l10n),
+          const SizedBox(height: 16),
+          Text(
+            l10n.translateWithArgs('history_results_count', {
+              'count': filtered.length.toString(),
+            }),
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 12),
+        ];
+
+        if (events.isEmpty) {
+          summaryContent.add(_HistoryEmptyState(message: l10n.translate('history_empty')));
+        } else if (filtered.isEmpty) {
+          summaryContent.add(_HistoryEmptyState(message: l10n.translate('history_filtered_empty')));
+        } else {
+          summaryContent.addAll(
+            filtered.map(
+              (event) => Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: EventTile(
+                  event: event,
+                  palette: palette,
+                  onTap: () => _openEvent(event),
+                  onBookmark: () => widget.bookmarksController.toggle(event.id),
+                  isBookmarked: widget.bookmarksController.isBookmarked(event.id),
                 ),
               ),
-              Expanded(
-                child: widget.controller.isLoading
-                    ? ListView.builder(
-                        padding: const EdgeInsets.all(24),
-                        itemCount: 3,
-                        itemBuilder: (_, __) => const Padding(
-                          padding: EdgeInsets.only(bottom: 16),
-                          child: Skeleton(height: 140),
-                        ),
-                      )
-                    : ListView(
-                        padding: const EdgeInsets.fromLTRB(24, 16, 24, 120),
+            ),
+          );
+        }
+
+        return Scaffold(
+          appBar: AppBar(title: Text(l10n.translate('history'))),
+          body: CustomScrollView(
+            physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+            slivers: [
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                sliver: SliverToBoxAdapter(
+                  child: Card(
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                      child: CalendarDatePicker(
+                        initialDate: widget.controller.selectedDate,
+                        firstDate: DateTime.now().subtract(const Duration(days: 365)),
+                        lastDate: DateTime.now().add(const Duration(days: 30)),
+                        onDateChanged: widget.controller.loadFor,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+                sliver: SliverToBoxAdapter(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.translate('history_filters_heading'),
+                        style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+                      ),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
                         children: [
-                          _HistorySummaryCard(events: events, l10n: l10n),
-                          const SizedBox(height: 16),
-                          Text(
-                            l10n.translateWithArgs('history_results_count', {
-                              'count': filtered.length.toString(),
-                            }),
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium
-                                ?.copyWith(fontWeight: FontWeight.w700),
+                          ChoiceChip(
+                            label: Text(l10n.translate('all')),
+                            selected: _selectedCategory == null,
+                            onSelected: (_) => setState(() => _selectedCategory = null),
                           ),
-                          const SizedBox(height: 12),
-                          if (events.isEmpty)
-                            _HistoryEmptyState(message: l10n.translate('history_empty'))
-                          else if (filtered.isEmpty)
-                            _HistoryEmptyState(message: l10n.translate('history_filtered_empty'))
-                          else
-                            ...filtered.map(
-                              (event) => Padding(
-                                padding: const EdgeInsets.only(bottom: 16),
-                                child: EventTile(
-                                  event: event,
-                                  palette: palette,
-                                  onTap: () => _openEvent(event),
-                                  onBookmark: () => widget.bookmarksController.toggle(event.id),
-                                  isBookmarked: widget.bookmarksController.isBookmarked(event.id),
-                                ),
-                              ),
+                          ...EventCategory.values.map(
+                            (category) => ChoiceChip(
+                              label: Text(l10n.translate(category.name)),
+                              selected: _selectedCategory == category,
+                              onSelected: (selected) =>
+                                  setState(() => _selectedCategory = selected ? category : null),
                             ),
+                          ),
+                          FilterChip(
+                            label: Text(l10n.translate('history_bookmarked_only')),
+                            selected: _bookmarkedOnly,
+                            onSelected: (value) => setState(() => _bookmarkedOnly = value),
+                          ),
                         ],
                       ),
+                    ],
+                  ),
+                ),
               ),
+              if (widget.controller.isLoading)
+                SliverPadding(
+                  padding: const EdgeInsets.all(24),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) => const Padding(
+                        padding: EdgeInsets.only(bottom: 16),
+                        child: Skeleton(height: 140),
+                      ),
+                      childCount: 3,
+                    ),
+                  ),
+                )
+              else
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(24, 16, 24, 120),
+                  sliver: SliverList(
+                    delegate: SliverChildListDelegate(summaryContent),
+                  ),
+                ),
             ],
           ),
         );

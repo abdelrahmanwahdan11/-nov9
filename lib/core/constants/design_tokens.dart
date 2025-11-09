@@ -35,4 +35,67 @@ class DesignTokens {
     'md': 6.0,
     'lg': 12.0,
   };
+
+  static const Map<String, Gradient> gradients = {
+    'background_light': LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [
+        Color(0xFFF7F9FB),
+        Color(0xFFE4FFF4),
+        Color(0xFFE1F4FF),
+      ],
+    ),
+    'background_dark': LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      colors: [
+        Color(0xFF0B0C0E),
+        Color(0xFF111A23),
+        Color(0xFF0F2330),
+      ],
+    ),
+    'card_light': LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [
+        Color(0xFFFFFFFF),
+        Color(0xFFEFFDF5),
+        Color(0xFFEAF6FF),
+      ],
+    ),
+    'card_dark': LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [
+        Color(0xFF14202A),
+        Color(0xFF172C3B),
+        Color(0xFF20354A),
+      ],
+    ),
+  };
+
+  static const softShadowsLight = <BoxShadow>[
+    BoxShadow(
+      color: Color(0x190E0F11),
+      blurRadius: 28,
+      spreadRadius: 1,
+      offset: Offset(0, 18),
+    ),
+    BoxShadow(
+      color: Color(0x145BB7FF),
+      blurRadius: 48,
+      spreadRadius: -6,
+      offset: Offset(0, 32),
+    ),
+  ];
+
+  static const softShadowsDark = <BoxShadow>[
+    BoxShadow(
+      color: Color(0x55000000),
+      blurRadius: 36,
+      spreadRadius: -4,
+      offset: Offset(0, 28),
+    ),
+  ];
 }

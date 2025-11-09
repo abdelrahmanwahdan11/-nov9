@@ -156,43 +156,37 @@ class _OnboardingSlideView extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        return Padding(
+        final rawHeight = constraints.maxHeight.isFinite ? constraints.maxHeight * 0.55 : 360.0;
+        final imageHeight = rawHeight.clamp(240.0, 420.0).toDouble();
+        return SingleChildScrollView(
           padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                flex: 5,
-                child: ClipRRect(
+          physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ClipRRect(
                   borderRadius: BorderRadius.circular(32),
-                  child: Image.network(slide.image, fit: BoxFit.cover, width: double.infinity),
+                  child: SizedBox(
+                    height: imageHeight,
+                    width: double.infinity,
+                    child: Image.network(slide.image, fit: BoxFit.cover),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 28),
-              Expanded(
-                flex: 3,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      slide.title,
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
-                    ),
-                    const SizedBox(height: 12),
-                    Expanded(
-                      child: Align(
-                        alignment: Alignment.topLeft,
-                        child: Text(
-                          slide.subtitle,
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: 32),
+                Text(
+                  slide.title,
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
                 ),
-              ),
-              const SizedBox(height: 8),
-            ],
+                const SizedBox(height: 16),
+                Text(
+                  slide.subtitle,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+                const SizedBox(height: 56),
+              ],
+            ),
           ),
         );
       },

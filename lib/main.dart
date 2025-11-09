@@ -5,6 +5,7 @@ import 'core/i18n/app_localizations.dart';
 import 'core/preferences/prefs_service.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'core/theme/app_scroll_behavior.dart';
 import 'data/services/local_article_parser.dart';
 import 'data/services/mock_event_service.dart';
 import 'data/services/mock_items_service.dart';
@@ -325,6 +326,7 @@ class DailyDigestApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           routerDelegate: routerDelegate,
           routeInformationParser: routeParser,
+          scrollBehavior: const AppScrollBehavior(),
           locale: settingsController.locale,
           supportedLocales: AppLocalizations.supportedLocales,
           localizationsDelegates: const [
